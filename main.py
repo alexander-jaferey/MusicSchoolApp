@@ -3,6 +3,7 @@
 from flask_migrate import Migrate
 
 from config import app, db
+from models import Instructor, Course, Instrument, InstructorCourseRelationship, InstructorInstrumentRelationship
 
 ### app config
 
