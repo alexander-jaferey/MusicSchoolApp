@@ -24,8 +24,8 @@ class InstructorCourseRelationship(db.Model):
 class InstructorInstrumentRelationship(db.Model):
     instructor_id = Column(ForeignKey('instructors.id'), primary_key=True)
     instrument_id = Column(ForeignKey('instruments.id'), primary_key=True)
-    instructor = relationship('Instructor', back_populates='instructors')
-    instrument = relationship('Instrument', back_populates='instruments')
+    instructor = relationship('Instructor', back_populates='instruments')
+    instrument = relationship('Instrument', back_populates='instructors')
 
 # main models
 class Instructor(db.Model):
