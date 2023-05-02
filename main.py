@@ -260,6 +260,116 @@ def get_individual_course(course_id):
         'instructors': instructors
     })
 
+#### delete requests
+
+@app.route('/instruments/<int:instrument_id>', methods=['DELETE'])
+def delete_instrument(instrument_id):
+    try:
+        instrument = db.session.execute(db.select(Instrument).where(Instrument.id == instrument_id)).one_or_none()
+        if instrument is None:
+            abort(404)
+
+        else:
+            instrument[0].delete()
+
+    except:
+        print(exc_info())
+        abort(500)
+
+    finally:
+        db.session.close()
+
+    return jsonify({
+        'success': True,
+        'deleted': instrument_id
+    })
+
+@app.route('/instructors/<int:instructor_id>', methods=['DELETE'])
+def delete_instructor(instructor_id):
+    try:
+        instructor = db.session.execute(db.select(Instructor).where(Instructor.id == instructor_id)).one_or_none()
+        if instructor is None:
+            abort(404)
+
+        else:
+            instructor[0].delete()
+
+    except:
+        print(exc_info())
+        abort(500)
+
+    finally:
+        db.session.close()
+
+    return jsonify({
+        'success': True,
+        'deleted': instructor_id
+    })
+
+@app.route('/courses/<int:course_id>', methods=['DELETE'])
+def delete_course(course_id):
+    try:
+        course = db.session.execute(db.select(Course).where(Course.id == course_id)).one_or_none()
+        if course is None:
+            abort(404)
+
+        else:
+            course[0].delete()
+
+    except:
+        print(exc_info())
+        abort(500)
+
+    finally:
+        db.session.close()
+
+    return jsonify({
+        'success': True,
+        'deleted': course_id
+    })
+
+#### error handlers
+
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+        'success': False,
+        'error': 400,
+        'message': 'bad request'
+    }), 400
+
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        'success': False,
+        'error': 404,
+        'message': 'resource not found'
+    }), 404
+
+@app.errorhandler(405)
+def method_not_allowed(error):
+    return jsonify({
+        'success': False,
+        'error': 405,
+        'message': 'method not allowed'
+    }), 405
+
+@app.errorhandler(422)
+def unprocessable(error):
+    return jsonify({
+        'success': False,
+        'error': 422,
+        'message': 'unprocessable'
+    }), 422
+
+@app.errorhandler(500)
+def server_error(error):
+    return jsonify({
+        'success': False,
+        'error': 500,
+        'message': 'internal server error'
+    }), 500
+
 ### launch
 
 if __name__ == "__main__":

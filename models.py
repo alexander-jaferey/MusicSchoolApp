@@ -44,13 +44,16 @@ class Instructor(db.Model):
     def name_short(self):
         return f"{self.first_name} {self.last_name[0]}"
     
-    def get_instruments(self):
-        instruments_query = db.session.execute(
-            db.select(Instrument).join(InstructorInstrumentRelationship).where(
-                InstructorInstrumentRelationship.instructor_id == id
-                )
-            )
-        return instruments_query
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 class Course(db.Model):
     __tablename__ = 'courses'
@@ -62,6 +65,16 @@ class Course(db.Model):
     instrument = relationship('Instrument', back_populates='courses')
     instructors: Mapped[List['InstructorCourseRelationship']] = relationship(back_populates='course')
     
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
 class Instrument(db.Model):
     __tablename__ = 'instruments'
@@ -70,3 +83,14 @@ class Instrument(db.Model):
     instrument = Column(String, nullable=False)
     instructors: Mapped[List['InstructorInstrumentRelationship']] = relationship(back_populates='instrument')
     courses = relationship('Course', back_populates='instrument')
+
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
