@@ -38,6 +38,19 @@ class Instructor(db.Model):
     courses: Mapped[List['InstructorCourseRelationship']] = relationship(back_populates='instructor')
     instruments: Mapped[List['InstructorInstrumentRelationship']] = relationship(back_populates='instructor')
 
+    def name(self):
+        return f"{self.first_name} {self.last_name}"
+    
+    def name_short(self):
+        return f"{self.first_name} {self.last_name[0]}"
+    
+    def get_instruments(self):
+        instruments_query = db.session.execute(
+            db.select(Instrument).join(InstructorInstrumentRelationship).where(
+                InstructorInstrumentRelationship.instructor_id == id
+                )
+            )
+        return instruments_query
 
 class Course(db.Model):
     __tablename__ = 'courses'
