@@ -1,6 +1,7 @@
 ### imports
 from sys import exc_info
 
+from sqlalchemy.exc import IntegrityError
 from flask import request, abort, jsonify
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -556,7 +557,17 @@ def add_instrument():
         instructors_dict = get_instructors_dict()
         new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
-    instrument.insert()
+    try:
+        instrument.insert()
+    
+    except IntegrityError:
+        raise BadInfoError(
+            {
+                "code": 422,
+                "description": "An instrument by that name already exists!"
+            },
+            422,
+        )
 
     if new_instructors_list:
         for instructor in new_instructors_list:
@@ -607,7 +618,17 @@ def add_instructor():
         courses_dict = get_courses_dict()
         new_courses_list = check_courses()
 
-    instructor.insert()
+    try:
+        instructor.insert()
+
+    except IntegrityError:
+        raise BadInfoError(
+            {
+                "code": 422,
+                "description": "An instructor by that name already exists!"
+            },
+            422,
+        )
 
     for instrument in new_instruments_list:
         instrument_join = InstructorInstrumentRelationship(
@@ -674,7 +695,17 @@ def add_course():
         instructors_dict = get_instructors_dict()
         new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
-    course.insert()
+    try:
+        course.insert()
+    
+    except IntegrityError:
+        raise BadInfoError(
+            {
+                "code": 422,
+                "description": "A course by that name already exists!"
+            },
+            422,
+        )
 
     if new_instructors_list:
         for instructor in new_instructors_list:
@@ -685,6 +716,300 @@ def add_course():
 
     return jsonify({"success": True, "id": course.id})
 
+
+#### patch requests
+
+
+@app.route("/instruments/<int:instrument_id>", methods=["PATCH"])
+def update_instrument(instrument_id):
+    try:
+        instrument_query = db.session.execute(
+            db.select(Instrument).where(Instrument.id == instrument_id)
+        ).one_or_none()
+        
+
+        if instrument_query is None:
+            abort(404)
+
+    except:
+        abort(404)
+
+    instrument = instrument_query[0]
+
+    try:
+        body = request.get_json()
+
+        if body is None:
+            abort(400)
+
+    except:
+        abort(400)
+
+    new_name = body.get("instrument", None)
+    new_instructors = body.get("new_instructors", None)
+    removed_instructors = body.get("removed_instructors", None)
+    new_instructors_list = None
+    removed_instructors_list = None
+
+    if new_name:
+        instrument.instrument = new_name.title()
+
+    if new_instructors:
+        instructors_dict = get_instructors_dict()
+        new_instructors_list = check_instructors(new_instructors, instructors_dict)
+
+    if new_instructors_list:
+        for instructor in new_instructors_list:
+            instructor_join = InstructorInstrumentRelationship(
+                instructor_id=instructors_dict[instructor], instrument_id=instrument.id
+            )
+            instructor_join.insert()
+
+    if removed_instructors:
+        instructors_dict = get_instructors_dict()
+        removed_instructors_list = check_instructors(removed_instructors, instructors_dict)
+
+    if removed_instructors_list:
+        for instructor in removed_instructors_list:
+            instructor_join_query = db.session.execute(
+                db.select(
+                InstructorInstrumentRelationship).where(
+                    InstructorInstrumentRelationship.instructor_id == instructors_dict[instructor]
+                    ).where( 
+                    InstructorInstrumentRelationship.instrument_id == instrument_id
+                    )
+                ).one_or_none()
+
+            if instructor_join_query is None:
+                pass
+
+            else:
+                instructor_join_query[0].delete()
+
+    if new_name:
+        try:
+            instrument.update()
+        
+        except IntegrityError:
+            raise BadInfoError(
+                {
+                    "code": 422,
+                    "description": "An instrument by that name already exists!"
+                },
+                422,
+            )
+
+    return jsonify({'success': True})
+
+@app.route("/instructors/<int:instructor_id>", methods=["PATCH"])
+def update_instructor(instructor_id):
+    try:
+        instructor_query = db.session.execute(
+            db.select(Instructor).where(Instructor.id == instructor_id)
+        )
+
+        if instructor_query is None:
+            abort(404)
+    
+    except:
+        abort(404)
+
+    instructor = instructor_query[0]
+
+    try:
+        body = request.get_json()
+
+        if body is None:
+            abort(400)
+
+    except:
+        abort(400)
+
+    new_first_name = body.get("first_name", None)
+    new_last_name = body.get("last_name", None)
+    new_schedule = body.get("workdays", None)
+    new_instruments = body.get("new_instruments", None)
+    removed_instruments = body.get("removed_instruments", None)
+    new_courses = body.get("new_courses", None)
+    removed_courses = body.get("removed_courses", None)
+
+    new_instruments_list = None
+    removed_instruments_list = None
+    new_courses_list = None
+    removed_courses_list = None
+
+    if new_first_name:
+        instructor.first_name = new_first_name.title()
+
+    if new_last_name:
+        instructor.last_name = new_last_name.title()
+
+    if new_schedule:
+        instructor.schedule = format_schedule(new_schedule)
+
+    if new_instruments:
+        instruments_dict = get_instruments_dict()
+        new_instruments_list = check_instruments(new_instruments, instruments_dict)
+
+    if new_instruments_list:
+        for instrument in new_instruments_list:
+            instrument_join = InstructorInstrumentRelationship(
+                instructor_id=instructor_id, instrument_id=instruments_dict[instrument]
+            )
+            instrument_join.insert()
+
+    if removed_instruments:
+        instruments_dict = get_instruments_dict()
+        removed_instruments_list = check_instruments(removed_instruments, instruments_dict)
+
+    if removed_instruments_list:
+        for instrument in removed_instruments_list:
+            instrument_join_query = db.session.execute(
+                db.select(
+                InstructorInstrumentRelationship).where(
+                InstructorInstrumentRelationship.instructor_id == instructor_id
+                ).where( 
+                InstructorInstrumentRelationship.instrument_id == instruments_dict[instrument]
+                )
+                ).one_or_none()
+
+            if instrument_join_query is None:
+                pass
+
+            else:
+                instrument_join_query[0].delete()
+
+    if new_courses:
+        courses_dict = get_courses_dict()
+        new_courses_list = check_courses(new_courses, courses_dict)
+
+    if new_courses_list:
+        for course in new_courses_list:
+            course_join = InstructorCourseRelationship(
+                instructor_id=instructor_id, course_id=courses_dict[course]
+            )
+            course_join.insert()
+
+    if removed_courses:
+        courses_dict = get_courses_dict()
+        removed_courses_list = check_courses(removed_courses, courses_dict)
+
+    if removed_courses_list:
+        for course in removed_courses_list:
+            course_join_query = db.session.execute(
+                db.select(
+                InstructorCourseRelationship).where(
+                InstructorCourseRelationship.instructor_id == instructor_id
+                ).where(
+                InstructorCourseRelationship.course_id == courses_dict[course]
+                )
+            ).one_or_none()
+
+        if course_join_query is None:
+            pass
+
+        else:
+            course_join_query[0].delete()
+
+    if new_first_name or new_last_name or new_schedule:
+        try:
+            instructor.update()
+
+        except IntegrityError:
+            raise BadInfoError(
+                {
+                    "code": 422,
+                    "description": "An instructor by that name already exists!"
+                },
+                422,
+            )
+
+    return jsonify({"success": True})    
+
+@app.route("/courses/<int:course_id>", methods=["PATCH"])
+def update_course(course_id):
+    try:
+        course_query = db.session.execute(
+            db.select(Course).where(Course.id == course_id)
+        ).one_or_none()
+
+        if course_query is None:
+            abort(404)
+
+    except:
+        abort(404)
+
+    course = course_query[0]
+
+    try:
+        body = request.get_json()
+
+        if body is None:
+            abort(400)
+
+    except:
+        abort(400)
+
+    new_title = body.get("title", None)
+    new_schedule = body.get("schedule", None)
+    new_instructors = body.get("new_instructors", None)
+    removed_instructors = body.get("removed_instructors", None)
+
+    new_instructors_list = []
+    removed_instructors_list = []
+
+    if new_title:
+        course.name = new_title
+
+    if new_schedule:
+        course.schedule = format_schedule(new_schedule)
+    
+    if new_instructors:
+        instructors_dict = get_instructors_dict()
+        new_instructors_list = check_instructors(new_instructors, instructors_dict)
+
+    if new_instructors_list:
+        for instructor in new_instructors_list:
+            instructor_join = InstructorCourseRelationship(
+                instructor_id=instructors_dict[instructor], course_id=course_id
+            )
+            instructor_join.insert()
+
+    if removed_instructors:
+        instructors_dict = get_instructors_dict()
+        removed_instructors_list = check_instructors(removed_instructors, instructors_dict)
+
+    if removed_instructors_list:
+        for instructor in removed_instructors_list:
+            instructor_join_query = db.session.execute(
+                db.select(
+                InstructorCourseRelationship).where(
+                    InstructorCourseRelationship.instructor_id == instructors_dict[instructor]
+                    ).where( 
+                    InstructorCourseRelationship.course_id == course_id
+                    )
+                ).one_or_none()
+
+            if instructor_join_query is None:
+                pass
+
+            else:
+                instructor_join_query[0].delete()
+
+    if new_title or new_schedule:
+        try:
+            course.update()
+        
+        except IntegrityError:
+            raise BadInfoError(
+                {
+                    "code": 422,
+                    "description": "A course by that name already exists!"
+                },
+                422,
+            )
+
+    return jsonify({"success": True})
 
 #### error handlers
 

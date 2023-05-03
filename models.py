@@ -56,6 +56,8 @@ class Instructor(db.Model):
     courses: Mapped[List["InstructorCourseRelationship"]] = relationship(back_populates="instructor", cascade="all, delete-orphan")
     instruments: Mapped[List["InstructorInstrumentRelationship"]] = relationship(back_populates="instructor", cascade="all, delete-orphan")
 
+    __table_args__ = (db.UniqueConstraint('first_name', 'last_name'),)
+
     def name(self):
         return f"{self.first_name} {self.last_name}"
     
@@ -77,7 +79,7 @@ class Course(db.Model):
     __tablename__ = "courses"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
     schedule = Column(ARRAY(String(length=3)))
     instrument_id = Column(ForeignKey("instruments.id"), nullable=False)
     instrument = relationship("Instrument", back_populates="courses")
@@ -98,7 +100,7 @@ class Instrument(db.Model):
     __tablename__ = "instruments"
 
     id = Column(Integer, primary_key=True)
-    instrument = Column(String, nullable=False)
+    instrument = Column(String, nullable=False, unique=True)
     instructors: Mapped[List["InstructorInstrumentRelationship"]] = relationship(back_populates="instrument", cascade="all, delete-orphan")
     courses = relationship("Course", back_populates="instrument", cascade="all, delete-orphan")
 
