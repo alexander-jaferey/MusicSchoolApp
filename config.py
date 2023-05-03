@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 db_url = getenv("DB_URL")
 
-app = Flask(__name__)
+app = Flask("music-school-api")
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 
 db = SQLAlchemy(app)
