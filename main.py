@@ -37,9 +37,10 @@ def after_request(response):
 
 ### helpers
 
-# schedule helpers
+#### schedule helpers
 weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
+##### schedule formatter to keep database consistent
 
 def format_schedule(schedule):
     try:
@@ -71,7 +72,10 @@ def format_schedule(schedule):
     return formatted_schedule
 
 
-# db helpers
+#### db helpers
+
+##### create dictionary with instructors info
+
 def get_instructors_dict():
     instructors_query = db.session.execute(
         db.select(Instructor).order_by(Instructor.id)
@@ -83,6 +87,7 @@ def get_instructors_dict():
 
     return instructors_dict
 
+##### create dictionary with instruments info
 
 def get_instruments_dict():
     instruments_query = db.session.execute(
@@ -95,6 +100,7 @@ def get_instruments_dict():
 
     return instruments_dict
 
+##### create dictionary with courses info
 
 def get_courses_dict():
     courses_query = db.session.execute(db.select(Course).order_by(Course.id))
@@ -105,6 +111,7 @@ def get_courses_dict():
 
     return courses_dict
 
+##### check a list of instructor names against the database and create dict with names and ids
 
 def check_instructors(new_instructors, instructors_dict):
     new_instructors_list = []
@@ -133,6 +140,7 @@ def check_instructors(new_instructors, instructors_dict):
 
     return new_instructors_list
 
+##### check a list of instrument names against the database and create dict with names and ids
 
 def check_instruments(new_instruments, instruments_dict):
     new_instruments_list = []
@@ -162,6 +170,7 @@ def check_instruments(new_instruments, instruments_dict):
 
     return new_instruments_list
 
+##### check a list of course names against the database and create dict with names and ids
 
 def check_courses(new_courses, courses_dict):
     new_courses_list = []
@@ -191,8 +200,25 @@ def check_courses(new_courses, courses_dict):
 
     return new_courses_list
 
+##### create dicts for later use
 
-# error helpers
+instructors_dict = get_instructors_dict()
+instruments_dict = get_instruments_dict()
+courses_dict = get_courses_dict()
+
+##### set null variables
+
+new_instruments_list = None
+new_instructors_list = None
+new_courses_list = None
+removed_instruments_list = None
+removed_instructors_list = None
+removed_courses_list = None
+
+#### error helpers
+
+##### error class to give more information when a request has invalid info
+
 class BadInfoError(Exception):
     def __init__(self, error, status_code):
         self.error = error
@@ -200,6 +226,20 @@ class BadInfoError(Exception):
 
 
 ### controllers
+
+#### auth endpoints
+
+@app.route("/login")
+def login():
+    return "nothing to see here"
+
+@app.route("/auth-result")
+def auth_result():
+    return "grab your token"
+
+@app.route("/logout")
+def logout():
+    return "seeya later"
 
 #### get requests
 
@@ -210,6 +250,7 @@ class BadInfoError(Exception):
 def get_instruments():
     instruments = {}
     try:
+        # get paginated list of instruments
         instrument_query = db.paginate(
             db.select(Instrument).order_by(Instrument.id), per_page=10
         )
@@ -229,6 +270,7 @@ def get_instruments():
 @app.route("/instruments/<int:instrument_id>")
 def get_individual_instrument(instrument_id):
     try:
+        # get instrument by provided id
         instrument = db.session.execute(
             db.select(Instrument).where(Instrument.id == instrument_id)
         ).one_or_none()
@@ -239,6 +281,7 @@ def get_individual_instrument(instrument_id):
         name = instrument[0].instrument
 
         instructors = {}
+        # get all instructors associated with this instrument
         instructors_query = db.session.execute(
             db.select(Instructor)
             .join(InstructorInstrumentRelationship)
@@ -247,16 +290,19 @@ def get_individual_instrument(instrument_id):
         for instructor in instructors_query:
             instructors[instructor[0].id] = instructor[0].name_short()
 
+        # provide friendly text if no instructors are found
         if len(instructors) == 0:
             instructors = f"There are currently no {name} instructors"
 
         courses = {}
+        # get all courses associated with this instrument
         courses_query = db.session.execute(
             db.select(Course).join(Instrument).where(Course.instrument_id == id)
         )
         for course in courses_query:
             courses[course[0].id] = course[0].name
 
+        # provide friendly text if no courses are found
         if len(courses) == 0:
             courses = f"There are currently no {name} courses"
 
@@ -285,17 +331,20 @@ def get_individual_instrument(instrument_id):
 def get_instructors():
     instructors = {}
     try:
+        # get paginated list of instructors
         instructor_query = db.paginate(
             db.select(Instructor).order_by(Instructor.id), per_page=10
         )
         if instructor_query is None:
             abort(404)
 
+        # create dict object with name and instruments for each instructor
         for instructor in instructor_query:
             instruments = []
             info = {}
             id = instructor.id
 
+            # get all instruments associated with this instructor
             instruments_query = db.session.execute(
                 db.select(Instrument)
                 .join(InstructorInstrumentRelationship)
@@ -307,6 +356,7 @@ def get_instructors():
 
             info["instructor"] = instructor.name_short()
             info["instruments"] = instruments
+            # add individual instructor dict to main dict
             instructors[id] = info
 
     except:
@@ -322,6 +372,7 @@ def get_instructors():
 @app.route("/instructors/<int:instructor_id>")
 def get_individual_instructor(instructor_id):
     try:
+        # get instructor by provided id
         instructor = db.session.execute(
             db.select(Instructor).where(Instructor.id == instructor_id)
         ).one_or_none()
@@ -333,6 +384,7 @@ def get_individual_instructor(instructor_id):
         workdays = instructor[0].schedule
 
         instruments = {}
+        # get all instruments associated with this instructor
         instruments_query = db.session.execute(
             db.select(Instrument)
             .join(InstructorInstrumentRelationship)
@@ -342,6 +394,7 @@ def get_individual_instructor(instructor_id):
             instruments[instrument[0].id] = instrument[0].instrument
 
         courses = {}
+        # get all courses associated with this instructor
         courses_query = db.session.execute(
             db.select(Course)
             .join(InstructorCourseRelationship)
@@ -350,6 +403,7 @@ def get_individual_instructor(instructor_id):
         for course in courses_query:
             courses[course[0].id] = course[0].name
 
+        # provide friendly text if no courses are found
         if len(courses) == 0:
             courses = (
                 f"{instructor[0].name_short()} is not teaching any courses currently"
@@ -381,15 +435,18 @@ def get_individual_instructor(instructor_id):
 def get_courses():
     courses = {}
     try:
+        # get paginated list of instruments
         instrument_query = db.paginate(
             db.select(Instrument).order_by(Instrument.id), per_page=5
         )
         if instrument_query is None:
             abort(404)
 
+        # create dict object with courses for each instrument
         for instrument in instrument_query:
             instrument_courses = {}
             id = instrument.id
+            # get all courses associated with this instrument
             course_query = db.session.execute(
                 db.select(Course)
                 .join(Instrument)
@@ -400,6 +457,7 @@ def get_courses():
             for course in course_query:
                 instrument_courses[course[0].id] = course[0].name
 
+            # add individual course dict to main dict
             courses[instrument.instrument] = instrument_courses
 
     except:
@@ -415,6 +473,7 @@ def get_courses():
 @app.route("/courses/<int:course_id>")
 def get_individual_course(course_id):
     try:
+        # get course by provided id
         course = db.session.execute(
             db.select(Course).where(Course.id == course_id)
         ).one_or_none()
@@ -422,6 +481,7 @@ def get_individual_course(course_id):
         title = course[0].name
         schedule = course[0].schedule
 
+        # get instrument associated with this course
         instrument_query = db.session.execute(
             db.select(Instrument).where(Instrument.id == course[0].instrument_id)
         ).one_or_none()
@@ -430,6 +490,7 @@ def get_individual_course(course_id):
         instrument = {"id": instrument_id, "name": instrument_name}
 
         instructors = {}
+        # get all instructors associated with this course
         instructors_query = db.session.execute(
             db.select(Instructor)
             .join(InstructorCourseRelationship)
@@ -438,6 +499,7 @@ def get_individual_course(course_id):
         for instructor in instructors_query:
             instructors[instructor[0].id] = instructor[0].name_short()
 
+        # provide friendly text if no instructors are found
         if len(instructors) == 0:
             instructors = f"There are currently no instructors teaching {title}"
 
@@ -464,6 +526,7 @@ def get_individual_course(course_id):
 @app.route("/instruments/<int:instrument_id>", methods=["DELETE"])
 def delete_instrument(instrument_id):
     try:
+        # get instrument by provided id
         instrument = db.session.execute(
             db.select(Instrument).where(Instrument.id == instrument_id)
         ).one_or_none()
@@ -486,6 +549,7 @@ def delete_instrument(instrument_id):
 @app.route("/instructors/<int:instructor_id>", methods=["DELETE"])
 def delete_instructor(instructor_id):
     try:
+        # get instructor by provided id
         instructor = db.session.execute(
             db.select(Instructor).where(Instructor.id == instructor_id)
         ).one_or_none()
@@ -508,6 +572,7 @@ def delete_instructor(instructor_id):
 @app.route("/courses/<int:course_id>", methods=["DELETE"])
 def delete_course(course_id):
     try:
+        # get course by provided id
         course = db.session.execute(
             db.select(Course).where(Course.id == course_id)
         ).one_or_none()
@@ -533,6 +598,7 @@ def delete_course(course_id):
 @app.route("/instruments", methods=["POST"])
 def add_instrument():
     try:
+        # get request body
         body = request.get_json()
 
         if body is None:
@@ -546,21 +612,23 @@ def add_instrument():
     new_instrument = body.get("instrument", None)
     new_instructors = body.get("instructors", None)
 
+    # error out if no instrument name is provided
     if not new_instrument:
         abort(422)
 
+    # create new instrument object with provided name
     instrument = Instrument(instrument=new_instrument.title())
 
-    new_instructors_list = None
-
+    # check list of instructors against database and create dict with names and ids
     if new_instructors:
-        instructors_dict = get_instructors_dict()
         new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
     try:
+        # add instrument to database
         instrument.insert()
     
     except IntegrityError:
+        # throw error for duplicate name
         raise BadInfoError(
             {
                 "code": 422,
@@ -570,6 +638,7 @@ def add_instrument():
         )
 
     if new_instructors_list:
+        # add rows to association table for each instructor in dict
         for instructor in new_instructors_list:
             instructor_join = InstructorInstrumentRelationship(
                 instructor_id=instructors_dict[instructor], instrument_id=instrument.id
@@ -582,6 +651,7 @@ def add_instrument():
 @app.route("/instructors", methods=["POST"])
 def add_instructor():
     try:
+        # get request body
         body = request.get_json()
 
         if body is None:
@@ -598,30 +668,32 @@ def add_instructor():
     new_instruments = body.get("instruments", None)
     new_courses = body.get("courses", None)
 
+    # error out if required fields are not provided
     if not (new_first_name and new_last_name and new_schedule and new_instruments):
         abort(422)
 
     formatted_schedule = format_schedule(new_schedule)
 
+    # create new instructor object with provided info
     instructor = Instructor(
         first_name=new_first_name.title(),
         last_name=new_last_name.title(),
         schedule=formatted_schedule,
     )
 
-    instruments_dict = get_instruments_dict()
+    # check list of instruments against database and create dict with names and ids
     new_instruments_list = check_instruments(new_instruments, instruments_dict)
 
-    new_courses_list = []
-
     if new_courses:
-        courses_dict = get_courses_dict()
+        # check list of coourses against database and create dict with names and ids
         new_courses_list = check_courses()
 
     try:
+        # add instructor to database
         instructor.insert()
 
     except IntegrityError:
+        # throw error for duplicate name
         raise BadInfoError(
             {
                 "code": 422,
@@ -631,6 +703,7 @@ def add_instructor():
         )
 
     for instrument in new_instruments_list:
+        # add rows to association table for each instrument in dict
         instrument_join = InstructorInstrumentRelationship(
             instructor_id=instructor.id, instrument_id=instruments_dict[instrument]
         )
@@ -638,6 +711,7 @@ def add_instructor():
 
     if new_courses_list:
         for course in new_courses_list:
+            # add rows to association table for each course in dict
             course_join = InstructorCourseRelationship(
                 instructor_id=instructor.id, course_id=courses_dict[course]
             )
@@ -649,6 +723,7 @@ def add_instructor():
 @app.route("/courses", methods=["POST"])
 def add_course():
     try:
+        # get request body
         body = request.get_json()
 
         if body is None:
@@ -662,17 +737,20 @@ def add_course():
     new_schedule = body.get("schedule", None)
     new_instructors = body.get("instructors", None)
 
+    # error out if required fields are not provided
     if not (new_title and new_instrument and new_schedule):
         abort(422)
 
     formatted_schedule = format_schedule(new_schedule)
 
+    # get instrument id
     try:
         instrument = db.session.execute(
             db.select(Instrument).where(Instrument.instrument == new_instrument.title())
         ).one_or_none()
 
     except:
+        # throw error if instrument not found
         raise BadInfoError(
             {
                 "code": 422,
@@ -683,22 +761,24 @@ def add_course():
 
     new_instrument_id = instrument[0].id
 
+    # create new course object with provided info
     course = Course(
         name=new_title.title(),
         schedule=formatted_schedule,
         instrument_id=new_instrument_id,
     )
 
-    new_instructors_list = None
-
     if new_instructors:
+        # check list of instructors against database and create dict with names and ids
         instructors_dict = get_instructors_dict()
         new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
     try:
+        # add course to database
         course.insert()
     
     except IntegrityError:
+        # throw error for duplicate name
         raise BadInfoError(
             {
                 "code": 422,
@@ -709,6 +789,7 @@ def add_course():
 
     if new_instructors_list:
         for instructor in new_instructors_list:
+            # add rows to association table for each instructor in dict
             instructor_join = InstructorCourseRelationship(
                 instructor_id=instructors_dict[instructor], course_id=course.id
             )
@@ -723,6 +804,7 @@ def add_course():
 @app.route("/instruments/<int:instrument_id>", methods=["PATCH"])
 def update_instrument(instrument_id):
     try:
+        # get instrument by provided id
         instrument_query = db.session.execute(
             db.select(Instrument).where(Instrument.id == instrument_id)
         ).one_or_none()
@@ -737,6 +819,7 @@ def update_instrument(instrument_id):
     instrument = instrument_query[0]
 
     try:
+        # get request body
         body = request.get_json()
 
         if body is None:
@@ -748,17 +831,17 @@ def update_instrument(instrument_id):
     new_name = body.get("instrument", None)
     new_instructors = body.get("new_instructors", None)
     removed_instructors = body.get("removed_instructors", None)
-    new_instructors_list = None
-    removed_instructors_list = None
 
     if new_name:
+        # update name if provided
         instrument.instrument = new_name.title()
 
     if new_instructors:
-        instructors_dict = get_instructors_dict()
+        # check list of instructors, if provided, against database and create dict with names and ids
         new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
     if new_instructors_list:
+        # add rows to association table for each instructor in dict
         for instructor in new_instructors_list:
             instructor_join = InstructorInstrumentRelationship(
                 instructor_id=instructors_dict[instructor], instrument_id=instrument.id
@@ -766,10 +849,11 @@ def update_instrument(instrument_id):
             instructor_join.insert()
 
     if removed_instructors:
-        instructors_dict = get_instructors_dict()
+        # check list of instructors to be deassociated from instrument, if provided, against database and create dict with names and ids
         removed_instructors_list = check_instructors(removed_instructors, instructors_dict)
 
     if removed_instructors_list:
+        # deleterows from association table for each instructor in dict
         for instructor in removed_instructors_list:
             instructor_join_query = db.session.execute(
                 db.select(
@@ -788,9 +872,11 @@ def update_instrument(instrument_id):
 
     if new_name:
         try:
+            # update instrument in database
             instrument.update()
         
         except IntegrityError:
+            # throw error for duplicate name
             raise BadInfoError(
                 {
                     "code": 422,
@@ -804,6 +890,7 @@ def update_instrument(instrument_id):
 @app.route("/instructors/<int:instructor_id>", methods=["PATCH"])
 def update_instructor(instructor_id):
     try:
+        # get instructor by provided id
         instructor_query = db.session.execute(
             db.select(Instructor).where(Instructor.id == instructor_id)
         )
@@ -817,6 +904,7 @@ def update_instructor(instructor_id):
     instructor = instructor_query[0]
 
     try:
+        # get request body
         body = request.get_json()
 
         if body is None:
@@ -833,11 +921,7 @@ def update_instructor(instructor_id):
     new_courses = body.get("new_courses", None)
     removed_courses = body.get("removed_courses", None)
 
-    new_instruments_list = None
-    removed_instruments_list = None
-    new_courses_list = None
-    removed_courses_list = None
-
+    # update each piece of information if provided
     if new_first_name:
         instructor.first_name = new_first_name.title()
 
@@ -848,10 +932,11 @@ def update_instructor(instructor_id):
         instructor.schedule = format_schedule(new_schedule)
 
     if new_instruments:
-        instruments_dict = get_instruments_dict()
+        # check list of instruments, if provided, against database and create dict with names and ids
         new_instruments_list = check_instruments(new_instruments, instruments_dict)
 
     if new_instruments_list:
+        # add rows to association table for each instrument in dict
         for instrument in new_instruments_list:
             instrument_join = InstructorInstrumentRelationship(
                 instructor_id=instructor_id, instrument_id=instruments_dict[instrument]
@@ -859,10 +944,11 @@ def update_instructor(instructor_id):
             instrument_join.insert()
 
     if removed_instruments:
-        instruments_dict = get_instruments_dict()
+        # check list of instruments to be deassociated from instructor, if provided, against database and create dict with names and ids
         removed_instruments_list = check_instruments(removed_instruments, instruments_dict)
 
     if removed_instruments_list:
+        # remove rows from association table for each instrument in dict
         for instrument in removed_instruments_list:
             instrument_join_query = db.session.execute(
                 db.select(
@@ -880,10 +966,12 @@ def update_instructor(instructor_id):
                 instrument_join_query[0].delete()
 
     if new_courses:
+        # check list of courses, if provided, against database and create dict with names and ids
         courses_dict = get_courses_dict()
         new_courses_list = check_courses(new_courses, courses_dict)
 
     if new_courses_list:
+        # add rows to association table for each course in dict
         for course in new_courses_list:
             course_join = InstructorCourseRelationship(
                 instructor_id=instructor_id, course_id=courses_dict[course]
@@ -891,10 +979,12 @@ def update_instructor(instructor_id):
             course_join.insert()
 
     if removed_courses:
+        # check list of courses to be deassociated from instructor, if provided, against database and create dict with names and ids
         courses_dict = get_courses_dict()
         removed_courses_list = check_courses(removed_courses, courses_dict)
 
     if removed_courses_list:
+        # remove rows from association table for each course in dict
         for course in removed_courses_list:
             course_join_query = db.session.execute(
                 db.select(
@@ -913,9 +1003,11 @@ def update_instructor(instructor_id):
 
     if new_first_name or new_last_name or new_schedule:
         try:
+            # update instructor in database
             instructor.update()
 
         except IntegrityError:
+            # throw error for duplicate name
             raise BadInfoError(
                 {
                     "code": 422,
@@ -929,6 +1021,7 @@ def update_instructor(instructor_id):
 @app.route("/courses/<int:course_id>", methods=["PATCH"])
 def update_course(course_id):
     try:
+        # get course by provided id
         course_query = db.session.execute(
             db.select(Course).where(Course.id == course_id)
         ).one_or_none()
@@ -942,6 +1035,7 @@ def update_course(course_id):
     course = course_query[0]
 
     try:
+        # get request body
         body = request.get_json()
 
         if body is None:
@@ -955,9 +1049,7 @@ def update_course(course_id):
     new_instructors = body.get("new_instructors", None)
     removed_instructors = body.get("removed_instructors", None)
 
-    new_instructors_list = []
-    removed_instructors_list = []
-
+    # update each piece of information if provided
     if new_title:
         course.name = new_title
 
@@ -965,10 +1057,11 @@ def update_course(course_id):
         course.schedule = format_schedule(new_schedule)
     
     if new_instructors:
-        instructors_dict = get_instructors_dict()
+        # check list of instructors, if provided, against database and create dict with names and ids
         new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
     if new_instructors_list:
+        # add rows to association table for each instructor in dict
         for instructor in new_instructors_list:
             instructor_join = InstructorCourseRelationship(
                 instructor_id=instructors_dict[instructor], course_id=course_id
@@ -976,10 +1069,11 @@ def update_course(course_id):
             instructor_join.insert()
 
     if removed_instructors:
-        instructors_dict = get_instructors_dict()
+        # check list of instructors to be deassociated from course, if provided, against database and create dict with names and ids
         removed_instructors_list = check_instructors(removed_instructors, instructors_dict)
 
     if removed_instructors_list:
+        # delete rows from association table for each instructor in dict
         for instructor in removed_instructors_list:
             instructor_join_query = db.session.execute(
                 db.select(
@@ -998,9 +1092,11 @@ def update_course(course_id):
 
     if new_title or new_schedule:
         try:
+            # update course in database
             course.update()
         
         except IntegrityError:
+            # throw error for duplicate name
             raise BadInfoError(
                 {
                     "code": 422,
