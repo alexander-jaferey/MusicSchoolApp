@@ -201,10 +201,10 @@ def check_courses(new_courses, courses_dict):
     return new_courses_list
 
 ##### create dicts for later use
-
-instructors_dict = get_instructors_dict()
-instruments_dict = get_instruments_dict()
-courses_dict = get_courses_dict()
+with app.app_context():
+    instructors_dict = get_instructors_dict()
+    instruments_dict = get_instruments_dict()
+    courses_dict = get_courses_dict()
 
 ##### set null variables
 
@@ -612,6 +612,8 @@ def add_instrument():
     new_instrument = body.get("instrument", None)
     new_instructors = body.get("instructors", None)
 
+    new_instructors_list = None
+
     # error out if no instrument name is provided
     if not new_instrument:
         abort(422)
@@ -667,6 +669,9 @@ def add_instructor():
     new_schedule = body.get("workdays", None)
     new_instruments = body.get("instruments", None)
     new_courses = body.get("courses", None)
+
+    new_instruments_list = None
+    new_courses_list = None
 
     # error out if required fields are not provided
     if not (new_first_name and new_last_name and new_schedule and new_instruments):
@@ -736,6 +741,8 @@ def add_course():
     new_instrument = body.get("instrument", None)
     new_schedule = body.get("schedule", None)
     new_instructors = body.get("instructors", None)
+
+    new_instructors_list = None
 
     # error out if required fields are not provided
     if not (new_title and new_instrument and new_schedule):
@@ -832,6 +839,8 @@ def update_instrument(instrument_id):
     new_instructors = body.get("new_instructors", None)
     removed_instructors = body.get("removed_instructors", None)
 
+    new_instructors_list = None
+
     if new_name:
         # update name if provided
         instrument.instrument = new_name.title()
@@ -920,6 +929,11 @@ def update_instructor(instructor_id):
     removed_instruments = body.get("removed_instruments", None)
     new_courses = body.get("new_courses", None)
     removed_courses = body.get("removed_courses", None)
+
+    new_instruments_list = None
+    new_courses_list = None
+    removed_instruments_list = None
+    removed_courses_list = None
 
     # update each piece of information if provided
     if new_first_name:
@@ -1048,6 +1062,9 @@ def update_course(course_id):
     new_schedule = body.get("schedule", None)
     new_instructors = body.get("new_instructors", None)
     removed_instructors = body.get("removed_instructors", None)
+
+    new_instructors_list = None
+    removed_instructors_list = None
 
     # update each piece of information if provided
     if new_title:
