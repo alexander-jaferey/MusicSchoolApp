@@ -1,7 +1,6 @@
 # MusicSchoolApp Frontend
 
 ## Getting Started
-___
 
 The MusicSchoolApp frontend is a Next.js frontend styled with TailwindCSS. The main dependencies are `node` and `npm`.
 
