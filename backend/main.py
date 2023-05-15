@@ -160,6 +160,7 @@ def check_instruments(new_instruments, instruments_dict):
                 new_instruments_list.append(instrument.title())
 
     except:
+        print(exc_info())
         raise BadInfoError(
             {
                 "code": 422,
@@ -226,20 +227,6 @@ class BadInfoError(Exception):
 
 
 ### controllers
-
-#### auth endpoints
-
-@app.route("/login")
-def login():
-    return "nothing to see here"
-
-@app.route("/auth-result")
-def auth_result():
-    return "grab your token"
-
-@app.route("/logout")
-def logout():
-    return "seeya later"
 
 #### get requests
 
@@ -1181,4 +1168,4 @@ def bad_info(error):
 if __name__ == "__main__":
     with app.app_context():
         app.debug = True
-        app.run()
+        app.run(host="0.0.0.0")
