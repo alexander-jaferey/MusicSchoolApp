@@ -1,7 +1,6 @@
 # MusicSchoolApp Backend
 
 ## Getting Started
-___
 
 The MusicSchoolApp backend API uses a Python 3 Flask API to communicate with a PostgreSQL database. The main dependencies follow:
 
@@ -13,7 +12,7 @@ The MusicSchoolApp backend API uses a Python 3 Flask API to communicate with a P
 
 #### **Database**
 
-Create your database and, from the backend directory, run `psql -d [DATABASE NAME] < db-init.sql` to set up the relations, replacing `db-init.sql` with `db-sample-data.sql` to additionally populate the database with sample data.
+Create your database with `createdb`. From the backend directory, `cd` into the db directory and run `psql -d [DATABASE NAME] < db-init.sql` to set up the relations, optionally running `psql -d [DATABASE NAME] < db-data.sql` to populate the database with sample data.
 
 #### **Flask Server**
 
@@ -21,14 +20,16 @@ From the backend directory, setup your virtual environment and run `pip3 install
 
 <br>
 
-## Testing
 ___
+
+## Testing
 
 **TODO**
 
 <br>
 
-## API Reference
 ___
 
-**TODO**
+## API Reference
+
+See the [API Reference document](db/api-reference.md) for detailed information on API endpoints.

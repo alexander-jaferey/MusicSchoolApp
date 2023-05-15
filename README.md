@@ -6,8 +6,9 @@ This application uses a Python/Flask backend written to PEP8 style guidelines to
 
 <br>
 
-## Getting Started
 ___
+
+## Getting Started
 
 ### Backend
 
@@ -22,7 +23,8 @@ The `./frontend` directory contains all of the files for running the Next.js fro
 
 <br>
 
-## Deployment
 ___
+
+## Deployment
 
 **TODO**

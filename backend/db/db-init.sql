@@ -21,7 +21,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: alembic_version; Type: TABLE; Schema: public; Owner: alex
+-- Name: alembic_version; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.alembic_version (
@@ -29,10 +29,10 @@ CREATE TABLE public.alembic_version (
 );
 
 
-ALTER TABLE public.alembic_version OWNER TO alex;
+ALTER TABLE public.alembic_version OWNER TO postgres;
 
 --
--- Name: courses; Type: TABLE; Schema: public; Owner: alex
+-- Name: courses; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.courses (
@@ -43,10 +43,10 @@ CREATE TABLE public.courses (
 );
 
 
-ALTER TABLE public.courses OWNER TO alex;
+ALTER TABLE public.courses OWNER TO postgres;
 
 --
--- Name: courses_id_seq; Type: SEQUENCE; Schema: public; Owner: alex
+-- Name: courses_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.courses_id_seq
@@ -58,17 +58,17 @@ CREATE SEQUENCE public.courses_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.courses_id_seq OWNER TO alex;
+ALTER TABLE public.courses_id_seq OWNER TO postgres;
 
 --
--- Name: courses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alex
+-- Name: courses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.courses_id_seq OWNED BY public.courses.id;
 
 
 --
--- Name: instructor_course_relationship; Type: TABLE; Schema: public; Owner: alex
+-- Name: instructor_course_relationship; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.instructor_course_relationship (
@@ -77,10 +77,10 @@ CREATE TABLE public.instructor_course_relationship (
 );
 
 
-ALTER TABLE public.instructor_course_relationship OWNER TO alex;
+ALTER TABLE public.instructor_course_relationship OWNER TO postgres;
 
 --
--- Name: instructor_instrument_relationship; Type: TABLE; Schema: public; Owner: alex
+-- Name: instructor_instrument_relationship; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.instructor_instrument_relationship (
@@ -89,10 +89,10 @@ CREATE TABLE public.instructor_instrument_relationship (
 );
 
 
-ALTER TABLE public.instructor_instrument_relationship OWNER TO alex;
+ALTER TABLE public.instructor_instrument_relationship OWNER TO postgres;
 
 --
--- Name: instructors; Type: TABLE; Schema: public; Owner: alex
+-- Name: instructors; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.instructors (
@@ -103,10 +103,10 @@ CREATE TABLE public.instructors (
 );
 
 
-ALTER TABLE public.instructors OWNER TO alex;
+ALTER TABLE public.instructors OWNER TO postgres;
 
 --
--- Name: instructors_id_seq; Type: SEQUENCE; Schema: public; Owner: alex
+-- Name: instructors_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.instructors_id_seq
@@ -118,17 +118,17 @@ CREATE SEQUENCE public.instructors_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.instructors_id_seq OWNER TO alex;
+ALTER TABLE public.instructors_id_seq OWNER TO postgres;
 
 --
--- Name: instructors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alex
+-- Name: instructors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.instructors_id_seq OWNED BY public.instructors.id;
 
 
 --
--- Name: instruments; Type: TABLE; Schema: public; Owner: alex
+-- Name: instruments; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.instruments (
@@ -137,10 +137,10 @@ CREATE TABLE public.instruments (
 );
 
 
-ALTER TABLE public.instruments OWNER TO alex;
+ALTER TABLE public.instruments OWNER TO postgres;
 
 --
--- Name: instruments_id_seq; Type: SEQUENCE; Schema: public; Owner: alex
+-- Name: instruments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
 CREATE SEQUENCE public.instruments_id_seq
@@ -152,38 +152,38 @@ CREATE SEQUENCE public.instruments_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.instruments_id_seq OWNER TO alex;
+ALTER TABLE public.instruments_id_seq OWNER TO postgres;
 
 --
--- Name: instruments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: alex
+-- Name: instruments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
 ALTER SEQUENCE public.instruments_id_seq OWNED BY public.instruments.id;
 
 
 --
--- Name: courses id; Type: DEFAULT; Schema: public; Owner: alex
+-- Name: courses id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.courses ALTER COLUMN id SET DEFAULT nextval('public.courses_id_seq'::regclass);
 
 
 --
--- Name: instructors id; Type: DEFAULT; Schema: public; Owner: alex
+-- Name: instructors id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructors ALTER COLUMN id SET DEFAULT nextval('public.instructors_id_seq'::regclass);
 
 
 --
--- Name: instruments id; Type: DEFAULT; Schema: public; Owner: alex
+-- Name: instruments id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instruments ALTER COLUMN id SET DEFAULT nextval('public.instruments_id_seq'::regclass);
 
 
 --
--- Data for Name: alembic_version; Type: TABLE DATA; Schema: public; Owner: alex
+-- Data for Name: alembic_version; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.alembic_version (version_num) FROM stdin;
@@ -191,7 +191,7 @@ COPY public.alembic_version (version_num) FROM stdin;
 
 
 --
--- Data for Name: courses; Type: TABLE DATA; Schema: public; Owner: alex
+-- Data for Name: courses; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.courses (id, name, schedule, instrument_id) FROM stdin;
@@ -199,7 +199,7 @@ COPY public.courses (id, name, schedule, instrument_id) FROM stdin;
 
 
 --
--- Data for Name: instructor_course_relationship; Type: TABLE DATA; Schema: public; Owner: alex
+-- Data for Name: instructor_course_relationship; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.instructor_course_relationship (instructor_id, course_id) FROM stdin;
@@ -207,7 +207,7 @@ COPY public.instructor_course_relationship (instructor_id, course_id) FROM stdin
 
 
 --
--- Data for Name: instructor_instrument_relationship; Type: TABLE DATA; Schema: public; Owner: alex
+-- Data for Name: instructor_instrument_relationship; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.instructor_instrument_relationship (instructor_id, instrument_id) FROM stdin;
@@ -215,7 +215,7 @@ COPY public.instructor_instrument_relationship (instructor_id, instrument_id) FR
 
 
 --
--- Data for Name: instructors; Type: TABLE DATA; Schema: public; Owner: alex
+-- Data for Name: instructors; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.instructors (id, first_name, last_name, schedule) FROM stdin;
@@ -223,7 +223,7 @@ COPY public.instructors (id, first_name, last_name, schedule) FROM stdin;
 
 
 --
--- Data for Name: instruments; Type: TABLE DATA; Schema: public; Owner: alex
+-- Data for Name: instruments; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.instruments (id, instrument) FROM stdin;
@@ -231,28 +231,28 @@ COPY public.instruments (id, instrument) FROM stdin;
 
 
 --
--- Name: courses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
+-- Name: courses_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.courses_id_seq', 21, true);
 
 
 --
--- Name: instructors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
+-- Name: instructors_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.instructors_id_seq', 36, true);
 
 
 --
--- Name: instruments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: alex
+-- Name: instruments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
 SELECT pg_catalog.setval('public.instruments_id_seq', 21, true);
 
 
 --
--- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.alembic_version
@@ -260,7 +260,7 @@ ALTER TABLE ONLY public.alembic_version
 
 
 --
--- Name: courses courses_name_key; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: courses courses_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.courses
@@ -268,7 +268,7 @@ ALTER TABLE ONLY public.courses
 
 
 --
--- Name: courses courses_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: courses courses_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.courses
@@ -276,7 +276,7 @@ ALTER TABLE ONLY public.courses
 
 
 --
--- Name: instructor_course_relationship instructor_course_relationship_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: instructor_course_relationship instructor_course_relationship_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructor_course_relationship
@@ -284,7 +284,7 @@ ALTER TABLE ONLY public.instructor_course_relationship
 
 
 --
--- Name: instructor_instrument_relationship instructor_instrument_relationship_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: instructor_instrument_relationship instructor_instrument_relationship_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructor_instrument_relationship
@@ -292,7 +292,7 @@ ALTER TABLE ONLY public.instructor_instrument_relationship
 
 
 --
--- Name: instructors instructors_first_name_last_name_key; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: instructors instructors_first_name_last_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructors
@@ -300,7 +300,7 @@ ALTER TABLE ONLY public.instructors
 
 
 --
--- Name: instructors instructors_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: instructors instructors_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructors
@@ -308,7 +308,7 @@ ALTER TABLE ONLY public.instructors
 
 
 --
--- Name: instruments instruments_instrument_key; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: instruments instruments_instrument_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instruments
@@ -316,7 +316,7 @@ ALTER TABLE ONLY public.instruments
 
 
 --
--- Name: instruments instruments_pkey; Type: CONSTRAINT; Schema: public; Owner: alex
+-- Name: instruments instruments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instruments
@@ -324,7 +324,7 @@ ALTER TABLE ONLY public.instruments
 
 
 --
--- Name: courses courses_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alex
+-- Name: courses courses_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.courses
@@ -332,7 +332,7 @@ ALTER TABLE ONLY public.courses
 
 
 --
--- Name: instructor_course_relationship instructor_course_relationship_course_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alex
+-- Name: instructor_course_relationship instructor_course_relationship_course_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructor_course_relationship
@@ -340,7 +340,7 @@ ALTER TABLE ONLY public.instructor_course_relationship
 
 
 --
--- Name: instructor_course_relationship instructor_course_relationship_instructor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alex
+-- Name: instructor_course_relationship instructor_course_relationship_instructor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructor_course_relationship
@@ -348,7 +348,7 @@ ALTER TABLE ONLY public.instructor_course_relationship
 
 
 --
--- Name: instructor_instrument_relationship instructor_instrument_relationship_instructor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alex
+-- Name: instructor_instrument_relationship instructor_instrument_relationship_instructor_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructor_instrument_relationship
@@ -356,7 +356,7 @@ ALTER TABLE ONLY public.instructor_instrument_relationship
 
 
 --
--- Name: instructor_instrument_relationship instructor_instrument_relationship_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: alex
+-- Name: instructor_instrument_relationship instructor_instrument_relationship_instrument_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.instructor_instrument_relationship
