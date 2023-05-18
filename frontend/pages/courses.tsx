@@ -27,7 +27,7 @@ export const getServerSideProps = async () => {
         </div>
         <div>
             <ul>
-                {Object.entries(data.courses).map((entry: any) => (
+                {Object.entries(data.courses).map((entry: object) => (
                     <li className="p-2">
                         <div className="text-lg font-bold">{entry[0]}:</div>
                         <ul>
