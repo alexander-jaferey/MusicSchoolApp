@@ -43,6 +43,7 @@ weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 ##### schedule formatter to keep database consistent
 
+
 def format_schedule(schedule):
     try:
         formatted_schedule = []
@@ -77,6 +78,7 @@ def format_schedule(schedule):
 
 ##### create dictionary with instructors info
 
+
 def get_instructors_dict():
     instructors_query = db.session.execute(
         db.select(Instructor).order_by(Instructor.id)
@@ -88,7 +90,9 @@ def get_instructors_dict():
 
     return instructors_dict
 
+
 ##### create dictionary with instruments info
+
 
 def get_instruments_dict():
     instruments_query = db.session.execute(
@@ -101,7 +105,9 @@ def get_instruments_dict():
 
     return instruments_dict
 
+
 ##### create dictionary with courses info
+
 
 def get_courses_dict():
     courses_query = db.session.execute(db.select(Course).order_by(Course.id))
@@ -112,7 +118,9 @@ def get_courses_dict():
 
     return courses_dict
 
+
 ##### check a list of instructor names against the database and create dict with names and ids
+
 
 def check_instructors(new_instructors, instructors_dict):
     new_instructors_list = []
@@ -141,7 +149,9 @@ def check_instructors(new_instructors, instructors_dict):
 
     return new_instructors_list
 
+
 ##### check a list of instrument names against the database and create dict with names and ids
+
 
 def check_instruments(new_instruments, instruments_dict):
     new_instruments_list = []
@@ -172,7 +182,9 @@ def check_instruments(new_instruments, instruments_dict):
 
     return new_instruments_list
 
+
 ##### check a list of course names against the database and create dict with names and ids
+
 
 def check_courses(new_courses, courses_dict):
     new_courses_list = []
@@ -202,6 +214,7 @@ def check_courses(new_courses, courses_dict):
 
     return new_courses_list
 
+
 ##### create dicts for later use
 with app.app_context():
     instructors_dict = get_instructors_dict()
@@ -220,6 +233,7 @@ removed_courses_list = None
 #### error helpers
 
 ##### error class to give more information when a request has invalid info
+
 
 class BadInfoError(Exception):
     def __init__(self, error, status_code):
@@ -248,13 +262,19 @@ def get_instruments():
         for instrument in instrument_query:
             instruments[instrument.id] = instrument.instrument
 
-        total_instruments = db.session.scalar(db.select(func.count(Instrument.id)))
-
     except:
         print(exc_info())
         abort(500)
 
-    return jsonify({"success": True, "instruments": instruments, "total_instruments": total_instruments})
+    return jsonify(
+        {
+            "success": True,
+            "instruments": instruments,
+            "total_instruments": instrument_query.total,
+            "current_page": instrument_query.page,
+            "total_pages": instrument_query.pages,
+        }
+    )
 
 
 @app.route("/instruments/<int:instrument_id>")
@@ -323,7 +343,7 @@ def get_instructors():
     try:
         # get paginated list of instructors
         instructor_query = db.paginate(
-            db.select(Instructor).order_by(Instructor.id), per_page=10
+            db.select(Instructor).order_by(Instructor.id), per_page=8
         )
         if instructor_query is None:
             abort(404)
@@ -349,8 +369,6 @@ def get_instructors():
             # add individual instructor dict to main dict
             instructors[id] = info
 
-        total_instructors = db.session.scalar(db.select(func.count(Instructor.id)))
-
     except:
         print(exc_info())
         abort(500)
@@ -358,7 +376,15 @@ def get_instructors():
     finally:
         db.session.close()
 
-    return jsonify({"success": True, "instructors": instructors, "total_instructors": total_instructors})
+    return jsonify(
+        {
+            "success": True,
+            "instructors": instructors,
+            "total_instructors": instructor_query.total,
+            "current_page": instructor_query.page,
+            "total_pages": instructor_query.pages,
+        }
+    )
 
 
 @app.route("/instructors/<int:instructor_id>")
@@ -429,7 +455,8 @@ def get_courses():
     try:
         # get paginated list of instruments
         instrument_query = db.paginate(
-            db.select(Instrument).order_by(Instrument.id), per_page=5
+            db.select(Instrument).order_by(Instrument.id),
+            per_page=5,
         )
         if instrument_query is None:
             abort(404)
@@ -452,8 +479,6 @@ def get_courses():
             # add individual course dict to main dict
             courses[instrument.instrument] = instrument_courses
 
-        total_instruments = db.session.scalar(db.select(func.count(Instrument.id)))
-
     except:
         print(exc_info())
         abort(500)
@@ -461,7 +486,15 @@ def get_courses():
     finally:
         db.session.close()
 
-    return jsonify({"success": True, "courses": courses, "total_instruments": total_instruments})
+    return jsonify(
+        {
+            "success": True,
+            "courses": courses,
+            "total_instruments": instrument_query.total,
+            "current_page": instrument_query.page,
+            "total_pages": instrument_query.pages,
+        }
+    )
 
 
 @app.route("/courses/<int:course_id>")
@@ -622,14 +655,11 @@ def add_instrument():
     try:
         # add instrument to database
         instrument.insert()
-    
+
     except IntegrityError:
         # throw error for duplicate name
         raise BadInfoError(
-            {
-                "code": 422,
-                "description": "An instrument by that name already exists!"
-            },
+            {"code": 422, "description": "An instrument by that name already exists!"},
             422,
         )
 
@@ -694,10 +724,7 @@ def add_instructor():
     except IntegrityError:
         # throw error for duplicate name
         raise BadInfoError(
-            {
-                "code": 422,
-                "description": "An instructor by that name already exists!"
-            },
+            {"code": 422, "description": "An instructor by that name already exists!"},
             422,
         )
 
@@ -777,14 +804,11 @@ def add_course():
     try:
         # add course to database
         course.insert()
-    
+
     except IntegrityError:
         # throw error for duplicate name
         raise BadInfoError(
-            {
-                "code": 422,
-                "description": "A course by that name already exists!"
-            },
+            {"code": 422, "description": "A course by that name already exists!"},
             422,
         )
 
@@ -809,7 +833,6 @@ def update_instrument(instrument_id):
         instrument_query = db.session.execute(
             db.select(Instrument).where(Instrument.id == instrument_id)
         ).one_or_none()
-        
 
         if instrument_query is None:
             abort(404)
@@ -853,19 +876,21 @@ def update_instrument(instrument_id):
 
     if removed_instructors:
         # check list of instructors to be deassociated from instrument, if provided, against database and create dict with names and ids
-        removed_instructors_list = check_instructors(removed_instructors, instructors_dict)
+        removed_instructors_list = check_instructors(
+            removed_instructors, instructors_dict
+        )
 
     if removed_instructors_list:
         # deleterows from association table for each instructor in dict
         for instructor in removed_instructors_list:
             instructor_join_query = db.session.execute(
-                db.select(
-                InstructorInstrumentRelationship).where(
-                    InstructorInstrumentRelationship.instructor_id == instructors_dict[instructor]
-                    ).where( 
-                    InstructorInstrumentRelationship.instrument_id == instrument_id
-                    )
-                ).one_or_none()
+                db.select(InstructorInstrumentRelationship)
+                .where(
+                    InstructorInstrumentRelationship.instructor_id
+                    == instructors_dict[instructor]
+                )
+                .where(InstructorInstrumentRelationship.instrument_id == instrument_id)
+            ).one_or_none()
 
             if instructor_join_query is None:
                 pass
@@ -877,18 +902,19 @@ def update_instrument(instrument_id):
         try:
             # update instrument in database
             instrument.update()
-        
+
         except IntegrityError:
             # throw error for duplicate name
             raise BadInfoError(
                 {
                     "code": 422,
-                    "description": "An instrument by that name already exists!"
+                    "description": "An instrument by that name already exists!",
                 },
                 422,
             )
 
-    return jsonify({'success': True})
+    return jsonify({"success": True})
+
 
 @app.route("/instructors/<int:instructor_id>", methods=["PATCH"])
 def update_instructor(instructor_id):
@@ -900,7 +926,7 @@ def update_instructor(instructor_id):
 
         if instructor_query is None:
             abort(404)
-    
+
     except:
         abort(404)
 
@@ -953,19 +979,21 @@ def update_instructor(instructor_id):
 
     if removed_instruments:
         # check list of instruments to be deassociated from instructor, if provided, against database and create dict with names and ids
-        removed_instruments_list = check_instruments(removed_instruments, instruments_dict)
+        removed_instruments_list = check_instruments(
+            removed_instruments, instruments_dict
+        )
 
     if removed_instruments_list:
         # remove rows from association table for each instrument in dict
         for instrument in removed_instruments_list:
             instrument_join_query = db.session.execute(
-                db.select(
-                InstructorInstrumentRelationship).where(
-                InstructorInstrumentRelationship.instructor_id == instructor_id
-                ).where( 
-                InstructorInstrumentRelationship.instrument_id == instruments_dict[instrument]
+                db.select(InstructorInstrumentRelationship)
+                .where(InstructorInstrumentRelationship.instructor_id == instructor_id)
+                .where(
+                    InstructorInstrumentRelationship.instrument_id
+                    == instruments_dict[instrument]
                 )
-                ).one_or_none()
+            ).one_or_none()
 
             if instrument_join_query is None:
                 pass
@@ -995,12 +1023,9 @@ def update_instructor(instructor_id):
         # remove rows from association table for each course in dict
         for course in removed_courses_list:
             course_join_query = db.session.execute(
-                db.select(
-                InstructorCourseRelationship).where(
-                InstructorCourseRelationship.instructor_id == instructor_id
-                ).where(
-                InstructorCourseRelationship.course_id == courses_dict[course]
-                )
+                db.select(InstructorCourseRelationship)
+                .where(InstructorCourseRelationship.instructor_id == instructor_id)
+                .where(InstructorCourseRelationship.course_id == courses_dict[course])
             ).one_or_none()
 
         if course_join_query is None:
@@ -1019,12 +1044,13 @@ def update_instructor(instructor_id):
             raise BadInfoError(
                 {
                     "code": 422,
-                    "description": "An instructor by that name already exists!"
+                    "description": "An instructor by that name already exists!",
                 },
                 422,
             )
 
-    return jsonify({"success": True})    
+    return jsonify({"success": True})
+
 
 @app.route("/courses/<int:course_id>", methods=["PATCH"])
 def update_course(course_id):
@@ -1066,7 +1092,7 @@ def update_course(course_id):
 
     if new_schedule:
         course.schedule = format_schedule(new_schedule)
-    
+
     if new_instructors:
         # check list of instructors, if provided, against database and create dict with names and ids
         new_instructors_list = check_instructors(new_instructors, instructors_dict)
@@ -1081,19 +1107,21 @@ def update_course(course_id):
 
     if removed_instructors:
         # check list of instructors to be deassociated from course, if provided, against database and create dict with names and ids
-        removed_instructors_list = check_instructors(removed_instructors, instructors_dict)
+        removed_instructors_list = check_instructors(
+            removed_instructors, instructors_dict
+        )
 
     if removed_instructors_list:
         # delete rows from association table for each instructor in dict
         for instructor in removed_instructors_list:
             instructor_join_query = db.session.execute(
-                db.select(
-                InstructorCourseRelationship).where(
-                    InstructorCourseRelationship.instructor_id == instructors_dict[instructor]
-                    ).where( 
-                    InstructorCourseRelationship.course_id == course_id
-                    )
-                ).one_or_none()
+                db.select(InstructorCourseRelationship)
+                .where(
+                    InstructorCourseRelationship.instructor_id
+                    == instructors_dict[instructor]
+                )
+                .where(InstructorCourseRelationship.course_id == course_id)
+            ).one_or_none()
 
             if instructor_join_query is None:
                 pass
@@ -1105,18 +1133,16 @@ def update_course(course_id):
         try:
             # update course in database
             course.update()
-        
+
         except IntegrityError:
             # throw error for duplicate name
             raise BadInfoError(
-                {
-                    "code": 422,
-                    "description": "A course by that name already exists!"
-                },
+                {"code": 422, "description": "A course by that name already exists!"},
                 422,
             )
 
     return jsonify({"success": True})
+
 
 #### error handlers
 

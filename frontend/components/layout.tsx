@@ -11,7 +11,7 @@ const Layout = ({ user, loading = false, children }: LayoutProps) => {
   return (
     <>
       <Head>
-        <title>{process.env.APP_NAME}</title>
+        <title>MusicSchoolApp</title>
       </Head>
 
       <Header user={user} loading={loading} />
