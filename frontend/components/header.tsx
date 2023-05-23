@@ -11,7 +11,7 @@ const Header = ({ user, loading }: HeaderProps) => (
       <div className="col-span-1 ml-4">
       </div>
       <div className="flex col-span-3" >
-        <Link href="/" className="text-lg font-semibold px-9">xskj music school</Link>
+        <Link href="/" className="text-lg font-semibold px-9">MusicSchoolApp</Link>
         <Link className="px-3" href="/instruments">instruments</Link>
         <Link className="px-3" href="/instructors">instructors</Link>
         <Link className="px-3" href="/courses">courses</Link>
