@@ -2,6 +2,7 @@
 from sys import exc_info
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import func
 from flask import request, abort, jsonify
 from flask_migrate import Migrate
 from flask_cors import CORS
@@ -247,11 +248,13 @@ def get_instruments():
         for instrument in instrument_query:
             instruments[instrument.id] = instrument.instrument
 
+        total_instruments = db.session.scalar(db.select(func.count(Instrument.id)))
+
     except:
         print(exc_info())
         abort(500)
 
-    return jsonify({"success": True, "instruments": instruments})
+    return jsonify({"success": True, "instruments": instruments, "total_instruments": total_instruments})
 
 
 @app.route("/instruments/<int:instrument_id>")
@@ -346,6 +349,8 @@ def get_instructors():
             # add individual instructor dict to main dict
             instructors[id] = info
 
+        total_instructors = db.session.scalar(db.select(func.count(Instructor.id)))
+
     except:
         print(exc_info())
         abort(500)
@@ -353,7 +358,7 @@ def get_instructors():
     finally:
         db.session.close()
 
-    return jsonify({"success": True, "instructors": instructors})
+    return jsonify({"success": True, "instructors": instructors, "total_instructors": total_instructors})
 
 
 @app.route("/instructors/<int:instructor_id>")
@@ -447,6 +452,8 @@ def get_courses():
             # add individual course dict to main dict
             courses[instrument.instrument] = instrument_courses
 
+        total_instruments = db.session.scalar(db.select(func.count(Instrument.id)))
+
     except:
         print(exc_info())
         abort(500)
@@ -454,7 +461,7 @@ def get_courses():
     finally:
         db.session.close()
 
-    return jsonify({"success": True, "courses": courses})
+    return jsonify({"success": True, "courses": courses, "total_instruments": total_instruments})
 
 
 @app.route("/courses/<int:course_id>")

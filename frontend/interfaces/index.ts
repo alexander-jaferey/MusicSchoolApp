@@ -27,3 +27,20 @@ export type Course = {
   schedule: string[]
   instructors: string[]
 }
+
+export type InstructorInfo = {
+  instructor: string
+  instruments: string[]
+}
+
+export type IndexedStringList = {
+  [index: string]: string
+}
+
+export type IndexedInstructorList = {
+  [index: string]: InstructorInfo
+}
+
+export type IndexedCourseList = {
+  [index: string]: IndexedStringList
+}
