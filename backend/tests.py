@@ -5,7 +5,7 @@ from os import getenv
 from flask_sqlalchemy import SQLAlchemy
 
 from main import app, db
-from models import Instructor, Course, Instrument
+from db.models import Instructor, Course, Instrument
 
 class Tests(unittest.TestCase):
     def setUp(self):
@@ -30,3 +30,34 @@ class Tests(unittest.TestCase):
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(len(data["instruments"]))
+        self.assertTrue(data["total_instruments"])
+        self.assertTrue(data["current_page"])
+        self.assertTrue(data["total_pages"])
+
+    def test_get_instructors(self):
+        res = self.client().get("/instructors")
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(len(data["instructors"]))
+        self.assertTrue(data["total_instructors"])
+        self.assertTrue(data["current_page"])
+        self.assertTrue(data["total_pages"])
+
+    def test_get_courses(self):
+        res = self.client().get("/courses")
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(len(data["courses"]))
+        self.assertTrue(data["total_instruments"])
+        self.assertTrue(data["current_page"])
+        self.assertTrue(data["total_pages"])
+
+
+if __name__ == "__main__":
+    unittest.main()
