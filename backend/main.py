@@ -45,23 +45,7 @@ weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 
 def format_schedule(schedule):
-    try:
-        formatted_schedule = []
-        for day in schedule:
-            short_day = day.title()[0:3]
-            if short_day not in weekdays:
-                raise BadInfoError(
-                    {
-                        "code": 422,
-                        "description": "Schedule entry contains non-valid name",
-                    },
-                    422,
-                )
-
-            else:
-                formatted_schedule.append(short_day)
-
-    except:
+    if type(schedule) is not list:
         print(exc_info())
         raise BadInfoError(
             {
@@ -70,6 +54,21 @@ def format_schedule(schedule):
             },
             422,
         )
+
+    formatted_schedule = []
+    for day in schedule:
+        short_day = day.title()[0:3]
+        if short_day not in weekdays:
+            raise BadInfoError(
+                {
+                    "code": 422,
+                    "description": "Schedule entry contains non-valid name",
+                },
+                422,
+            )
+
+        else:
+            formatted_schedule.append(short_day)
 
     return formatted_schedule
 
@@ -123,21 +122,7 @@ def get_courses_dict():
 
 
 def check_instructors(new_instructors, instructors_dict):
-    new_instructors_list = []
-    try:
-        for instructor in new_instructors:
-            if instructor.title() not in instructors_dict:
-                raise BadInfoError(
-                    {
-                        "code": 422,
-                        "description": f"Instructor '{instructor.title()}' not in list. If this was not a mistake, add instructor first.",
-                    },
-                    422,
-                )
-
-            else:
-                new_instructors_list.append(instructor.title())
-    except:
+    if type(new_instructors) is not list:
         print(exc_info())
         raise BadInfoError(
             {
@@ -146,6 +131,20 @@ def check_instructors(new_instructors, instructors_dict):
             },
             422,
         )
+    
+    new_instructors_list = []
+    for instructor in new_instructors:
+        if instructor.title() not in instructors_dict:
+            raise BadInfoError(
+                {
+                    "code": 422,
+                    "description": f"Instructor '{instructor.title()}' not in list. If this was not a mistake, add instructor first.",
+                },
+                422,
+            )
+
+        else:
+            new_instructors_list.append(instructor.title())
 
     return new_instructors_list
 
@@ -154,23 +153,7 @@ def check_instructors(new_instructors, instructors_dict):
 
 
 def check_instruments(new_instruments, instruments_dict):
-    new_instruments_list = []
-
-    try:
-        for instrument in new_instruments:
-            if instrument.title() not in instruments_dict:
-                raise BadInfoError(
-                    {
-                        "code": 422,
-                        "description": f"Instrument '{instrument.title()}' not in list. If this was not a mistake, add instrument first.",
-                    },
-                    422,
-                )
-
-            else:
-                new_instruments_list.append(instrument.title())
-
-    except:
+    if type(new_instruments) is not list:
         print(exc_info())
         raise BadInfoError(
             {
@@ -180,6 +163,20 @@ def check_instruments(new_instruments, instruments_dict):
             422,
         )
 
+    new_instruments_list = []
+    for instrument in new_instruments:
+        if instrument.title() not in instruments_dict:
+            raise BadInfoError(
+                {
+                    "code": 422,
+                    "description": f"Instrument '{instrument.title()}' not in list. If this was not a mistake, add instrument first.",
+                },
+                422,
+            )
+
+        else:
+            new_instruments_list.append(instrument.title())
+
     return new_instruments_list
 
 
@@ -187,23 +184,7 @@ def check_instruments(new_instruments, instruments_dict):
 
 
 def check_courses(new_courses, courses_dict):
-    new_courses_list = []
-
-    try:
-        for course in new_courses:
-            if course.title() not in courses_dict:
-                raise BadInfoError(
-                    {
-                        "code": 422,
-                        "description": f"Course '{course.title()}' not in list. If this was not a mistake, add course first.",
-                    },
-                    422,
-                )
-
-            else:
-                new_courses_list.append(course.title())
-
-    except:
+    if type(new_courses) is not list:
         raise BadInfoError(
             {
                 "code": 422,
@@ -211,6 +192,20 @@ def check_courses(new_courses, courses_dict):
             },
             422,
         )
+    
+    new_courses_list = []
+    for course in new_courses:
+        if course.title() not in courses_dict:
+            raise BadInfoError(
+                {
+                    "code": 422,
+                    "description": f"Course '{course.title()}' not in list. If this was not a mistake, add course first.",
+                },
+                422,
+            )
+
+        else:
+            new_courses_list.append(course.title())
 
     return new_courses_list
 
@@ -242,6 +237,16 @@ class BadInfoError(Exception):
 
 
 ### controllers
+
+#### tests
+
+#@app.route("/schedule-test", methods=["POST"])
+#def test_schedules():
+    #body = request.get_json()
+    #schedule = body.get("schedule")
+    #print(format_schedule(schedule))
+
+    #return jsonify({"success": True})
 
 #### get requests
 

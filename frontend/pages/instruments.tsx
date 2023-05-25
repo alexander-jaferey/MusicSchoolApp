@@ -66,6 +66,7 @@ function Page({
       </div>
       <br />
       <Pagination
+        target="instruments"
         currentPage={data.current_page}
         totalPages={data.total_pages}
         pages={pages}
