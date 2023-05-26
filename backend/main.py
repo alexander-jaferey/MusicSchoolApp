@@ -8,7 +8,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 from config import app, db
-from auth.auth import requires_auth
+from auth.auth import requires_auth, AuthError
 from db.models import (
     Instructor,
     Course,
@@ -132,7 +132,7 @@ def check_instructors(new_instructors, instructors_dict):
             },
             422,
         )
-    
+
     new_instructors_list = []
     for instructor in new_instructors:
         if instructor.title() not in instructors_dict:
@@ -193,7 +193,7 @@ def check_courses(new_courses, courses_dict):
             },
             422,
         )
-    
+
     new_courses_list = []
     for course in new_courses:
         if course.title() not in courses_dict:
@@ -241,13 +241,13 @@ class BadInfoError(Exception):
 
 #### tests
 
-#@app.route("/schedule-test", methods=["POST"])
-#def test_schedules():
-    #body = request.get_json()
-    #schedule = body.get("schedule")
-    #print(format_schedule(schedule))
+# @app.route("/schedule-test", methods=["POST"])
+# def test_schedules():
+# body = request.get_json()
+# schedule = body.get("schedule")
+# print(format_schedule(schedule))
 
-    #return jsonify({"success": True})
+# return jsonify({"success": True})
 
 #### get requests
 
@@ -255,7 +255,7 @@ class BadInfoError(Exception):
 
 
 @app.route("/instruments")
-def get_instruments(payload):
+def get_instruments():
     instruments = {}
     try:
         # get paginated list of instruments
@@ -345,7 +345,7 @@ def get_individual_instrument(payload, instrument_id):
 
 
 @app.route("/instructors")
-def get_instructors(payload):
+def get_instructors():
     instructors = {}
     try:
         # get paginated list of instructors
@@ -458,7 +458,7 @@ def get_individual_instructor(payload, instructor_id):
 
 
 @app.route("/courses")
-def get_courses(payload):
+def get_courses():
     courses = {}
     try:
         # get paginated list of instruments
@@ -1201,6 +1201,21 @@ def server_error(error):
 
 @app.errorhandler(BadInfoError)
 def bad_info(error):
+    body = error.error
+    return (
+        jsonify(
+            {
+                "success": False,
+                "error": error.status_code,
+                "message": body["description"],
+            }
+        ),
+        error.status_code,
+    )
+
+
+@app.errorhandler(AuthError)
+def auth_error(error):
     body = error.error
     return (
         jsonify(
