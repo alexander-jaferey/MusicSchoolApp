@@ -8,6 +8,7 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 from config import app, db
+from auth.auth import requires_auth
 from db.models import (
     Instructor,
     Course,
@@ -254,7 +255,7 @@ class BadInfoError(Exception):
 
 
 @app.route("/instruments")
-def get_instruments():
+def get_instruments(payload):
     instruments = {}
     try:
         # get paginated list of instruments
@@ -283,7 +284,8 @@ def get_instruments():
 
 
 @app.route("/instruments/<int:instrument_id>")
-def get_individual_instrument(instrument_id):
+@requires_auth("get:instruments")
+def get_individual_instrument(payload, instrument_id):
     try:
         # get instrument by provided id
         instrument = db.session.execute(
@@ -343,7 +345,7 @@ def get_individual_instrument(instrument_id):
 
 
 @app.route("/instructors")
-def get_instructors():
+def get_instructors(payload):
     instructors = {}
     try:
         # get paginated list of instructors
@@ -393,7 +395,8 @@ def get_instructors():
 
 
 @app.route("/instructors/<int:instructor_id>")
-def get_individual_instructor(instructor_id):
+@requires_auth("get:instructors")
+def get_individual_instructor(payload, instructor_id):
     try:
         # get instructor by provided id
         instructor = db.session.execute(
@@ -455,7 +458,7 @@ def get_individual_instructor(instructor_id):
 
 
 @app.route("/courses")
-def get_courses():
+def get_courses(payload):
     courses = {}
     try:
         # get paginated list of instruments
@@ -503,7 +506,8 @@ def get_courses():
 
 
 @app.route("/courses/<int:course_id>")
-def get_individual_course(course_id):
+@requires_auth("get:courses")
+def get_individual_course(payload, course_id):
     try:
         # get course by provided id
         course = db.session.execute(
@@ -556,7 +560,8 @@ def get_individual_course(course_id):
 
 
 @app.route("/instruments/<int:instrument_id>", methods=["DELETE"])
-def delete_instrument(instrument_id):
+@requires_auth("delete:instruments")
+def delete_instrument(payload, instrument_id):
     try:
         # get instrument by provided id
         instrument = db.session.execute(
@@ -579,7 +584,8 @@ def delete_instrument(instrument_id):
 
 
 @app.route("/instructors/<int:instructor_id>", methods=["DELETE"])
-def delete_instructor(instructor_id):
+@requires_auth("delete:instructors")
+def delete_instructor(payload, instructor_id):
     try:
         # get instructor by provided id
         instructor = db.session.execute(
@@ -602,7 +608,8 @@ def delete_instructor(instructor_id):
 
 
 @app.route("/courses/<int:course_id>", methods=["DELETE"])
-def delete_course(course_id):
+@requires_auth("delete:courses")
+def delete_course(payload, course_id):
     try:
         # get course by provided id
         course = db.session.execute(
@@ -628,7 +635,8 @@ def delete_course(course_id):
 
 
 @app.route("/instruments", methods=["POST"])
-def add_instrument():
+@requires_auth("post:instruments")
+def add_instrument(payload):
     try:
         # get request body
         body = request.get_json()
@@ -680,7 +688,8 @@ def add_instrument():
 
 
 @app.route("/instructors", methods=["POST"])
-def add_instructor():
+@requires_auth("post:instructors")
+def add_instructor(payload):
     try:
         # get request body
         body = request.get_json()
@@ -752,7 +761,8 @@ def add_instructor():
 
 
 @app.route("/courses", methods=["POST"])
-def add_course():
+@requires_auth("post:courses")
+def add_course(payload):
     try:
         # get request body
         body = request.get_json()
@@ -832,7 +842,8 @@ def add_course():
 
 
 @app.route("/instruments/<int:instrument_id>", methods=["PATCH"])
-def update_instrument(instrument_id):
+@requires_auth("patch:instruments")
+def update_instrument(payload, instrument_id):
     try:
         # get instrument by provided id
         instrument_query = db.session.execute(
@@ -922,7 +933,8 @@ def update_instrument(instrument_id):
 
 
 @app.route("/instructors/<int:instructor_id>", methods=["PATCH"])
-def update_instructor(instructor_id):
+@requires_auth("patch:instructors")
+def update_instructor(payload, instructor_id):
     try:
         # get instructor by provided id
         instructor_query = db.session.execute(
@@ -1058,7 +1070,8 @@ def update_instructor(instructor_id):
 
 
 @app.route("/courses/<int:course_id>", methods=["PATCH"])
-def update_course(course_id):
+@requires_auth("patch:courses")
+def update_course(payload, course_id):
     try:
         # get course by provided id
         course_query = db.session.execute(
