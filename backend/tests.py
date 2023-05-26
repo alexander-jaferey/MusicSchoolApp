@@ -24,7 +24,7 @@ class Tests(unittest.TestCase):
         pass
 
 
-
+    # test getting full list of instruments
     def test_get_instruments(self):
         res = self.client().get("/instruments")
         data = json.loads(res.data)
@@ -36,6 +36,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(data["current_page"])
         self.assertTrue(data["total_pages"])
 
+    # test getting full list of instructors
     def test_get_instructors(self):
         res = self.client().get("/instructors")
         data = json.loads(res.data)
@@ -47,6 +48,7 @@ class Tests(unittest.TestCase):
         self.assertTrue(data["current_page"])
         self.assertTrue(data["total_pages"])
 
+    # test getting full list of courses
     def test_get_courses(self):
         res = self.client().get("/courses")
         data = json.loads(res.data)
@@ -57,6 +59,29 @@ class Tests(unittest.TestCase):
         self.assertTrue(data["total_instruments"])
         self.assertTrue(data["current_page"])
         self.assertTrue(data["total_pages"])
+
+    # test getting individual instrument info with authentication
+    def test_get_individual_instrument(self):
+        jwt = getenv("ADMIN_JWT")
+        res = self.client().get("/instruments/1", headers={"Authorization": f"Bearer {jwt}"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["instrument id"])
+        self.assertTrue(data["instrument"])
+        self.assertTrue(len(data["instructors"]))
+        self.assertTrue(len(data["courses"]))
+
+    # test for auth failure when getting individual instrument with no header
+    def test_401_no_auth_header_get_individual_instrument(self):
+        res = self.client().get("/instruments/1")
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 401)
+        self.assertTrue(data["message"])
 
 
 if __name__ == "__main__":
