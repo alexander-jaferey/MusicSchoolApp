@@ -3,7 +3,6 @@ import { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
 import { IndexedStringList } from "../interfaces";
 import { useUser } from "@auth0/nextjs-auth0";
-import ReactPaginate from "react-paginate";
 import Pagination from "../components/pagination";
 
 const dbURL = `${process.env.BACKEND_URL}/instruments`;

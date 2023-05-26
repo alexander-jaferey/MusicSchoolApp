@@ -10,6 +10,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 load_dotenv()
 db_url = getenv("DB_URL")
+auth0_domain = getenv("AUTH0_DOMAIN")
+api_audience = getenv("API_AUDIENCE")
 
 app = Flask("music-school-api")
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
