@@ -32,4 +32,4 @@ ___
 
 ## API Reference
 
-See the [API Reference document](db/api-reference.md) for detailed information on API endpoints.
+See the [API Reference document](api-reference.md) for detailed information on API endpoints.
