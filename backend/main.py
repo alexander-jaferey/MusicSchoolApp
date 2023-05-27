@@ -299,14 +299,12 @@ def create_app(test_config=None):
     @app.route("/instruments/<int:instrument_id>")
     @requires_auth("get:instruments")
     def get_individual_instrument(payload, instrument_id):
-        try:
-            # get instrument by provided id
-            instrument = db.session.execute(
-                db.select(Instrument).where(Instrument.id == instrument_id)
-            ).one_or_none()
-            if instrument is None:
-                abort(404)
+        # get instrument by provided id
+        instrument = db.one_or_404(
+            db.select(Instrument).where(Instrument.id == instrument_id)
+        ).one_or_none()
 
+        try:
             id = instrument[0].id
             name = instrument[0].instrument
 
@@ -410,14 +408,12 @@ def create_app(test_config=None):
     @app.route("/instructors/<int:instructor_id>")
     @requires_auth("get:instructors")
     def get_individual_instructor(payload, instructor_id):
-        try:
-            # get instructor by provided id
-            instructor = db.session.execute(
-                db.select(Instructor).where(Instructor.id == instructor_id)
-            ).one_or_none()
-            if instructor is None:
-                abort(404)
+        # get instructor by provided id
+        instructor = db.one_or_404(
+            db.select(Instructor).where(Instructor.id == instructor_id)
+        ).one_or_none()
 
+        try:
             id = instructor[0].id
             name = instructor[0].name()
             workdays = instructor[0].schedule
@@ -521,11 +517,12 @@ def create_app(test_config=None):
     @app.route("/courses/<int:course_id>")
     @requires_auth("get:courses")
     def get_individual_course(payload, course_id):
-        try:
             # get course by provided id
-            course = db.session.execute(
-                db.select(Course).where(Course.id == course_id)
-            ).one_or_none()
+        course = db.one_or_404(
+            db.select(Course).where(Course.id == course_id)
+        ).one_or_none()
+
+        try:
             id = course[0].id
             title = course[0].name
             schedule = course[0].schedule
@@ -575,16 +572,12 @@ def create_app(test_config=None):
     @app.route("/instruments/<int:instrument_id>", methods=["DELETE"])
     @requires_auth("delete:instruments")
     def delete_instrument(payload, instrument_id):
+        # get instrument by provided id
+        instrument = db.one_or_404(
+            db.select(Instrument).where(Instrument.id == instrument_id)
+        ).one_or_none()
         try:
-            # get instrument by provided id
-            instrument = db.session.execute(
-                db.select(Instrument).where(Instrument.id == instrument_id)
-            ).one_or_none()
-            if instrument is None:
-                abort(404)
-
-            else:
-                instrument[0].delete()
+            instrument[0].delete()
 
         except:
             print(exc_info())
@@ -599,16 +592,13 @@ def create_app(test_config=None):
     @app.route("/instructors/<int:instructor_id>", methods=["DELETE"])
     @requires_auth("delete:instructors")
     def delete_instructor(payload, instructor_id):
-        try:
-            # get instructor by provided id
-            instructor = db.session.execute(
-                db.select(Instructor).where(Instructor.id == instructor_id)
-            ).one_or_none()
-            if instructor is None:
-                abort(404)
+        # get instructor by provided id
+        instructor = db.one_or_404(
+            db.select(Instructor).where(Instructor.id == instructor_id)
+        ).one_or_none()
 
-            else:
-                instructor[0].delete()
+        try:
+            instructor[0].delete()
 
         except:
             print(exc_info())
@@ -623,16 +613,13 @@ def create_app(test_config=None):
     @app.route("/courses/<int:course_id>", methods=["DELETE"])
     @requires_auth("delete:courses")
     def delete_course(payload, course_id):
-        try:
-            # get course by provided id
-            course = db.session.execute(
-                db.select(Course).where(Course.id == course_id)
-            ).one_or_none()
-            if course is None:
-                abort(404)
+        # get course by provided id
+        course = db.one_or_404(
+            db.select(Course).where(Course.id == course_id)
+        ).one_or_none()
 
-            else:
-                course[0].delete()
+        try:
+            course[0].delete()
 
         except:
             print(exc_info())
@@ -857,17 +844,10 @@ def create_app(test_config=None):
     @app.route("/instruments/<int:instrument_id>", methods=["PATCH"])
     @requires_auth("patch:instruments")
     def update_instrument(payload, instrument_id):
-        try:
-            # get instrument by provided id
-            instrument_query = db.session.execute(
-                db.select(Instrument).where(Instrument.id == instrument_id)
-            ).one_or_none()
-
-            if instrument_query is None:
-                abort(404)
-
-        except:
-            abort(404)
+        # get instrument by provided id
+        instrument_query = db.one_or_404(
+            db.select(Instrument).where(Instrument.id == instrument_id)
+        ).one_or_none()
 
         instrument = instrument_query[0]
 
@@ -1085,17 +1065,10 @@ def create_app(test_config=None):
     @app.route("/courses/<int:course_id>", methods=["PATCH"])
     @requires_auth("patch:courses")
     def update_course(payload, course_id):
-        try:
-            # get course by provided id
-            course_query = db.session.execute(
-                db.select(Course).where(Course.id == course_id)
-            ).one_or_none()
-
-            if course_query is None:
-                abort(404)
-
-        except:
-            abort(404)
+        # get course by provided id
+        course_query = db.one_or_404(
+            db.select(Course).where(Course.id == course_id)
+        ).one_or_none()
 
         course = course_query[0]
 
