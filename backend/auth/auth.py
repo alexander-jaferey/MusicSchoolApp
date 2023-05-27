@@ -2,6 +2,7 @@
 import json
 
 from functools import wraps
+from sys import exc_info
 from jose import jwt, ExpiredSignatureError
 from flask import request, _request_ctx_stack
 from urllib.request import urlopen

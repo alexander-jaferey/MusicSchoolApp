@@ -2,11 +2,16 @@
 
 from typing import List
 
-from config import db
+from config import db_url
 from sqlalchemy import Column, String, Integer, ForeignKey
+from flask_sqlalchemy import SQLAlchemy
 
 from sqlalchemy.orm import relationship, Mapped
 from sqlalchemy.dialects.postgresql import ARRAY
+
+### setup db
+
+db = SQLAlchemy()
 
 ### models
 
