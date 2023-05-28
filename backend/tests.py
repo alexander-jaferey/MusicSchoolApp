@@ -60,7 +60,6 @@ class Tests(unittest.TestCase):
         jwt = getenv("ADMIN_JWT")
         res = self.client().get("/instruments/1", headers={"Authorization": f"Bearer {jwt}"})
         data = json.loads(res.data)
-        print(data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
@@ -135,7 +134,7 @@ class Tests(unittest.TestCase):
     # test deleting instrument with authentication
     def test_delete_instrument(self):
         jwt = getenv("ADMIN_JWT")
-        res = self.client().delete("/instruments/2", headers={"Authorization": f"Bearer {jwt}"})
+        res = self.client().delete("/instruments/17", headers={"Authorization": f"Bearer {jwt}"})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -145,7 +144,7 @@ class Tests(unittest.TestCase):
 
     # test for auth failure when deleting individual instrument with no header
     def test_401_no_auth_header_delete_instrument(self):
-        res = self.client().delete("/instruments/5")
+        res = self.client().delete("/instruments/7")
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 401)
@@ -169,7 +168,7 @@ class Tests(unittest.TestCase):
     # test deleting instructor with authentication
     def test_delete_instructor(self):
         jwt = getenv("ADMIN_JWT")
-        res = self.client().delete("/instructors/6", headers={"Authorization": f"Bearer {jwt}"})
+        res = self.client().delete("/instructors/19", headers={"Authorization": f"Bearer {jwt}"})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -203,7 +202,7 @@ class Tests(unittest.TestCase):
     # test deleting course with authentication
     def test_delete_course(self):
         jwt = getenv("ADMIN_JWT")
-        res = self.client().delete("/courses/4", headers={"Authorization": f"Bearer {jwt}"})
+        res = self.client().delete("/courses/20", headers={"Authorization": f"Bearer {jwt}"})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -232,6 +231,328 @@ class Tests(unittest.TestCase):
         self.assertEqual(data["success"], False)
         self.assertEqual(data["error"], 403)
         self.assertTrue(data["message"])
+
+
+    # test posting instrument with authentication
+    def test_post_instrument(self):
+        jwt = getenv("ADMIN_JWT")
+        res = self.client().post(
+            "/instruments", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={"instrument": "Violin"}
+        )
+        data = json.loads(res.data)
+        instrument = db.session.execute(db.select(Instrument).where(Instrument.instrument == "Violin")).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["id"])
+        self.assertTrue(instrument)
+
+
+    # test for auth failure when posting instrument with no header
+    def test_401_no_auth_header_post_instrument(self):
+        res = self.client().post("instruments", json={"instrument": "Violin"})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 401)
+        self.assertTrue(data["message"])
+
+
+    # test for auth failure when posting instrument with insufficient permissions
+    def test_403_insufficient_permissions_post_instrument(self):
+        jwt = getenv("STUDENT_JWT")
+        res = self.client().post(
+            "/instruments", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={"instrument": "Viola"}
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 403)
+        self.assertTrue(data["message"])
+
+
+    # test posting instructor with authentication
+    def test_post_instructor(self):
+        jwt = getenv("ADMIN_JWT")
+        res = self.client().post(
+            "/instructors", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "first_name": "Thom", 
+                "last_name": "Yorke", 
+                "workdays": ["Sun", "Tue", "Fri", "Sat"], 
+                "instruments": ["Vocals", "Piano", "Guitar"]
+            }
+        )
+        data = json.loads(res.data)
+        instructor = db.session.execute(db.select(Instructor).where(Instructor.first_name == "Thom" and Instructor.last_name == "Yorke")).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["id"])
+        self.assertTrue(instructor)
+
+
+    # test for auth failure when posting instructor with no header
+    def test_401_no_auth_header_post_instructor(self):
+        res = self.client().post(
+            "/instructors", 
+            json={
+                "first_name": "Bob", 
+                "last_name": "Dylan", 
+                "workdays": ["Sun", "Wed", "Fri", "Sat"], 
+                "instruments": ["Vocals", "Guitar"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 401)
+        self.assertTrue(data["message"])
+
+
+    # test for auth failure when posting instructor with insufficient permissions
+    def test_403_insufficient_permissions_post_instructor(self):
+        jwt = getenv("STUDENT_JWT")
+        res = self.client().post(
+            "/instructors", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "first_name": "Bob", 
+                "last_name": "Dylan", 
+                "workdays": ["Sun", "Wed", "Fri", "Sat"], 
+                "instruments": ["Vocals", "Guitar"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 403)
+        self.assertTrue(data["message"])
+
+
+    # test posting course with authentication
+    def test_post_course(self):
+        jwt = getenv("ADMIN_JWT")
+        res = self.client().post(
+            "/courses", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "title": "Funk Guitar", 
+                "instrument": "Guitar", 
+                "schedule": ["Mon", "Wed"]
+            }
+        )
+        data = json.loads(res.data)
+        course = db.session.execute(db.select(Course).where(Course.name == "Funk Guitar")).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertTrue(data["id"])
+        self.assertTrue(course)
+
+
+    # test for auth failure when posting course with no header
+    def test_401_no_auth_header_post_course(self):
+        res = self.client().post(
+            "/courses", 
+            json={
+                "title": "Metal Guitar", 
+                "instrument": "Guitar", 
+                "schedule": ["Mon", "Wed"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 401)
+        self.assertTrue(data["message"])
+
+
+    # test for auth failure when posting course with insufficient permissions
+    def test_403_insufficient_permissions_post_course(self):
+        jwt = getenv("STUDENT_JWT")
+        res = self.client().post(
+            "/courses", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "title": "Metal Guitar", 
+                "instrument": "Guitar", 
+                "schedule": ["Mon", "Wed"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 403)
+        self.assertTrue(data["message"])
+
+    
+    # test patching instrument with authentication
+    def test_patch_instrument(self):
+        jwt = getenv("ADMIN_JWT")
+        res = self.client().patch(
+            "/instruments/5", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "new_instructors": ["Steve Martin"], 
+                "removed_instructors": ["Jimi Hendrix"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+
+
+    # test for auth failure when patching instrument with no header
+    def test_401_no_auth_header_patch_instrument(self):
+        res = self.client().patch(
+            "/instruments/5", 
+            json={
+                "new_instructors": ["Tina Weymouth"], 
+                "removed_instructors": ["Ringo Starr"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 401)
+        self.assertTrue(data["message"])
+
+    
+    # test for auth failure when patching instrument with insufficient permissions
+    def test_403_insufficient_permissions_patch_instrument(self):
+        jwt = getenv("STUDENT_JWT")
+        res = self.client().patch(
+            "/instruments/5", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "new_instructors": ["Tina Weymouth"], 
+                "removed_instructors": ["Ringo Starr"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 403)
+        self.assertTrue(data["message"])
+
+
+    # test patching instructor with authentication
+    def test_patch_instructor(self):
+        jwt = getenv("ADMIN_JWT")
+        res = self.client().patch(
+            "/instructors/7", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "new_instruments": ["Vocals"] 
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+
+
+    # test for auth failure when patching instructor with no header
+    def test_401_no_auth_header_patch_instructor(self):
+        res = self.client().patch(
+            "/instructors/1", 
+            json={
+                "new_instruments": ["Vocals"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 401)
+        self.assertTrue(data["message"])
+
+    
+    # test for auth failure when patching instructor with insufficient permissions
+    def test_403_insufficient_permissions_patch_instructor(self):
+        jwt = getenv("STUDENT_JWT")
+        res = self.client().patch(
+            "/instructors/1", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "new_instruments": ["Vocals"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 403)
+        self.assertTrue(data["message"])
+    
+    
+    # test patching course with authentication
+    def test_patch_course(self):
+        jwt = getenv("ADMIN_JWT")
+        res = self.client().patch(
+            "/courses/14", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "new_instructors": ["Jimi Hendrix"], 
+                "removed_instructors": ["Ringo Starr"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+
+
+    # test for auth failure when patching course with no header
+    def test_401_no_auth_header_patch_course(self):
+        res = self.client().patch(
+            "/courses/14", 
+            json={
+                "new_instructors": ["Kim Deal"], 
+                "removed_instructors": ["Ian Anderson"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 401)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 401)
+        self.assertTrue(data["message"])
+
+    
+    # test for auth failure when patching course with insufficient permissions
+    def test_403_insufficient_permissions_patch_course(self):
+        jwt = getenv("STUDENT_JWT")
+        res = self.client().patch(
+            "/courses/14", 
+            headers={"Authorization": f"Bearer {jwt}"}, 
+            json={
+                "new_instructors": ["Kim Deal"], 
+                "removed_instructors": ["Ian Anderson"]
+            }
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 403)
+        self.assertEqual(data["success"], False)
+        self.assertEqual(data["error"], 403)
+        self.assertTrue(data["message"])
+
 
 if __name__ == "__main__":
     unittest.main()
