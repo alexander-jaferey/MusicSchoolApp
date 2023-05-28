@@ -17,12 +17,12 @@ from db.models import (
     InstructorCourseRelationship,
     InstructorInstrumentRelationship,
 )
+
+
 def create_app(test_config=None):
     ### app config
     app = Flask("music_school_api")
-    app.config.from_mapping(
-        SQLALCHEMY_DATABASE_URI=db_url
-    )
+    app.config.from_mapping(SQLALCHEMY_DATABASE_URI=db_url)
 
     if test_config is not None:
         app.config.from_mapping(test_config)
@@ -37,7 +37,6 @@ def create_app(test_config=None):
     # initialize flask-CORS
     CORS(app)
 
-
     # setup CORS headers
     @app.after_request
     def after_request(response):
@@ -49,14 +48,12 @@ def create_app(test_config=None):
         )
         return response
 
-
     ### helpers
 
     #### schedule helpers
     weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
     ##### schedule formatter to keep database consistent
-
 
     def format_schedule(schedule):
         if type(schedule) is not list:
@@ -86,11 +83,9 @@ def create_app(test_config=None):
 
         return formatted_schedule
 
-
     #### db helpers
 
     ##### create dictionary with instructors info
-
 
     def get_instructors_dict():
         instructors_query = db.session.execute(
@@ -103,9 +98,7 @@ def create_app(test_config=None):
 
         return instructors_dict
 
-
     ##### create dictionary with instruments info
-
 
     def get_instruments_dict():
         instruments_query = db.session.execute(
@@ -118,9 +111,7 @@ def create_app(test_config=None):
 
         return instruments_dict
 
-
     ##### create dictionary with courses info
-
 
     def get_courses_dict():
         courses_query = db.session.execute(db.select(Course).order_by(Course.id))
@@ -131,9 +122,7 @@ def create_app(test_config=None):
 
         return courses_dict
 
-
     ##### check a list of instructor names against the database and create dict with names and ids
-
 
     def check_instructors(new_instructors, instructors_dict):
         if type(new_instructors) is not list:
@@ -162,9 +151,7 @@ def create_app(test_config=None):
 
         return new_instructors_list
 
-
     ##### check a list of instrument names against the database and create dict with names and ids
-
 
     def check_instruments(new_instruments, instruments_dict):
         if type(new_instruments) is not list:
@@ -193,9 +180,7 @@ def create_app(test_config=None):
 
         return new_instruments_list
 
-
     ##### check a list of course names against the database and create dict with names and ids
-
 
     def check_courses(new_courses, courses_dict):
         if type(new_courses) is not list:
@@ -223,13 +208,6 @@ def create_app(test_config=None):
 
         return new_courses_list
 
-
-    ##### create dicts for later use
-    with app.app_context():
-        instructors_dict = get_instructors_dict()
-        instruments_dict = get_instruments_dict()
-        courses_dict = get_courses_dict()
-
     ##### set null variables
 
     new_instruments_list = None
@@ -243,29 +221,29 @@ def create_app(test_config=None):
 
     ##### error class to give more information when a request has invalid info
 
-
     class BadInfoError(Exception):
         def __init__(self, error, status_code):
             self.error = error
             self.status_code = status_code
 
-
     ### controllers
 
     #### tests
 
-    # @app.route("/schedule-test", methods=["POST"])
-    # def test_schedules():
-    # body = request.get_json()
-    # schedule = body.get("schedule")
-    # print(format_schedule(schedule))
+    @app.route("/test")
+    def test():
+        query = db.session.execute(db.select(Instructor).where(Instructor.first_name == "Jimi" and Instructor.last_name == "Hendrix")).one_or_none()
+        print(query)
 
-    # return jsonify({"success": True})
+        if query is None:
+            return "query is none"
+        else:
+            return "query is not none"
+
 
     #### get requests
 
     ##### instruments
-
 
     @app.route("/instruments")
     def get_instruments():
@@ -295,18 +273,17 @@ def create_app(test_config=None):
             }
         )
 
-
     @app.route("/instruments/<int:instrument_id>")
     @requires_auth("get:instruments")
     def get_individual_instrument(payload, instrument_id):
         # get instrument by provided id
         instrument = db.one_or_404(
             db.select(Instrument).where(Instrument.id == instrument_id)
-        ).one_or_none()
+        )
 
         try:
-            id = instrument[0].id
-            name = instrument[0].instrument
+            id = instrument.id
+            name = instrument.instrument
 
             instructors = {}
             # get all instructors associated with this instrument
@@ -351,9 +328,7 @@ def create_app(test_config=None):
             }
         )
 
-
     ##### instructors
-
 
     @app.route("/instructors")
     def get_instructors():
@@ -377,6 +352,7 @@ def create_app(test_config=None):
                     db.select(Instrument)
                     .join(InstructorInstrumentRelationship)
                     .where(InstructorInstrumentRelationship.instructor_id == id)
+                    .order_by(Instrument.id)
                 )
 
                 for instrument in instruments_query:
@@ -404,19 +380,18 @@ def create_app(test_config=None):
             }
         )
 
-
     @app.route("/instructors/<int:instructor_id>")
     @requires_auth("get:instructors")
     def get_individual_instructor(payload, instructor_id):
         # get instructor by provided id
         instructor = db.one_or_404(
             db.select(Instructor).where(Instructor.id == instructor_id)
-        ).one_or_none()
+        )
 
         try:
-            id = instructor[0].id
-            name = instructor[0].name()
-            workdays = instructor[0].schedule
+            id = instructor.id
+            name = instructor.name()
+            workdays = instructor.schedule
 
             instruments = {}
             # get all instruments associated with this instructor
@@ -440,9 +415,7 @@ def create_app(test_config=None):
 
             # provide friendly text if no courses are found
             if len(courses) == 0:
-                courses = (
-                    f"{instructor[0].name_short()} is not teaching any courses currently"
-                )
+                courses = f"{instructor[0].name_short()} is not teaching any courses currently"
 
         except:
             print(exc_info())
@@ -462,9 +435,7 @@ def create_app(test_config=None):
             }
         )
 
-
     ##### courses
-
 
     @app.route("/courses")
     def get_courses():
@@ -513,26 +484,23 @@ def create_app(test_config=None):
             }
         )
 
-
     @app.route("/courses/<int:course_id>")
     @requires_auth("get:courses")
     def get_individual_course(payload, course_id):
-            # get course by provided id
-        course = db.one_or_404(
-            db.select(Course).where(Course.id == course_id)
-        ).one_or_none()
+        # get course by provided id
+        course = db.one_or_404(db.select(Course).where(Course.id == course_id))
 
         try:
-            id = course[0].id
-            title = course[0].name
-            schedule = course[0].schedule
+            id = course.id
+            title = course.name
+            schedule = course.schedule
 
             # get instrument associated with this course
             instrument_query = db.session.execute(
-                db.select(Instrument).where(Instrument.id == course[0].instrument_id)
+                db.select(Instrument).where(Instrument.id == course.instrument_id)
             ).one_or_none()
             instrument_name = instrument_query[0].instrument
-            instrument_id = course[0].instrument_id
+            instrument_id = course.instrument_id
             instrument = {"id": instrument_id, "name": instrument_name}
 
             instructors = {}
@@ -565,9 +533,7 @@ def create_app(test_config=None):
             }
         )
 
-
     #### delete requests
-
 
     @app.route("/instruments/<int:instrument_id>", methods=["DELETE"])
     @requires_auth("delete:instruments")
@@ -575,9 +541,9 @@ def create_app(test_config=None):
         # get instrument by provided id
         instrument = db.one_or_404(
             db.select(Instrument).where(Instrument.id == instrument_id)
-        ).one_or_none()
+        )
         try:
-            instrument[0].delete()
+            instrument.delete()
 
         except:
             print(exc_info())
@@ -588,17 +554,16 @@ def create_app(test_config=None):
 
         return jsonify({"success": True, "deleted": instrument_id})
 
-
     @app.route("/instructors/<int:instructor_id>", methods=["DELETE"])
     @requires_auth("delete:instructors")
     def delete_instructor(payload, instructor_id):
         # get instructor by provided id
         instructor = db.one_or_404(
             db.select(Instructor).where(Instructor.id == instructor_id)
-        ).one_or_none()
+        )
 
         try:
-            instructor[0].delete()
+            instructor.delete()
 
         except:
             print(exc_info())
@@ -609,17 +574,14 @@ def create_app(test_config=None):
 
         return jsonify({"success": True, "deleted": instructor_id})
 
-
     @app.route("/courses/<int:course_id>", methods=["DELETE"])
     @requires_auth("delete:courses")
     def delete_course(payload, course_id):
         # get course by provided id
-        course = db.one_or_404(
-            db.select(Course).where(Course.id == course_id)
-        ).one_or_none()
+        course = db.one_or_404(db.select(Course).where(Course.id == course_id))
 
         try:
-            course[0].delete()
+            course.delete()
 
         except:
             print(exc_info())
@@ -630,9 +592,7 @@ def create_app(test_config=None):
 
         return jsonify({"success": True, "deleted": course_id})
 
-
     #### post requests
-
 
     @app.route("/instruments", methods=["POST"])
     @requires_auth("post:instruments")
@@ -663,6 +623,7 @@ def create_app(test_config=None):
 
         # check list of instructors against database and create dict with names and ids
         if new_instructors:
+            instructors_dict = get_instructors_dict()
             new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
         try:
@@ -672,7 +633,10 @@ def create_app(test_config=None):
         except IntegrityError:
             # throw error for duplicate name
             raise BadInfoError(
-                {"code": 422, "description": "An instrument by that name already exists!"},
+                {
+                    "code": 422,
+                    "description": "An instrument by that name already exists!",
+                },
                 422,
             )
 
@@ -680,12 +644,12 @@ def create_app(test_config=None):
             # add rows to association table for each instructor in dict
             for instructor in new_instructors_list:
                 instructor_join = InstructorInstrumentRelationship(
-                    instructor_id=instructors_dict[instructor], instrument_id=instrument.id
+                    instructor_id=instructors_dict[instructor],
+                    instrument_id=instrument.id,
                 )
                 instructor_join.insert()
 
         return jsonify({"success": True, "id": instrument.id})
-
 
     @app.route("/instructors", methods=["POST"])
     @requires_auth("post:instructors")
@@ -725,11 +689,13 @@ def create_app(test_config=None):
         )
 
         # check list of instruments against database and create dict with names and ids
+        instruments_dict = get_instruments_dict()
         new_instruments_list = check_instruments(new_instruments, instruments_dict)
 
         if new_courses:
             # check list of coourses against database and create dict with names and ids
-            new_courses_list = check_courses()
+            courses_dict = get_courses_dict()
+            new_courses_list = check_courses(new_courses, courses_dict)
 
         try:
             # add instructor to database
@@ -738,7 +704,10 @@ def create_app(test_config=None):
         except IntegrityError:
             # throw error for duplicate name
             raise BadInfoError(
-                {"code": 422, "description": "An instructor by that name already exists!"},
+                {
+                    "code": 422,
+                    "description": "An instructor by that name already exists!",
+                },
                 422,
             )
 
@@ -758,7 +727,6 @@ def create_app(test_config=None):
                 course_join.insert()
 
         return jsonify({"success": True, "id": instructor.id})
-
 
     @app.route("/courses", methods=["POST"])
     @requires_auth("post:courses")
@@ -789,8 +757,11 @@ def create_app(test_config=None):
         # get instrument id
         try:
             instrument = db.session.execute(
-                db.select(Instrument).where(Instrument.instrument == new_instrument.title())
+                db.select(Instrument).where(
+                    Instrument.instrument == new_instrument.title()
+                )
             ).one_or_none()
+            new_instrument_id = instrument[0].id
 
         except:
             # throw error if instrument not found
@@ -801,8 +772,6 @@ def create_app(test_config=None):
                 },
                 422,
             )
-
-        new_instrument_id = instrument[0].id
 
         # create new course object with provided info
         course = Course(
@@ -837,19 +806,15 @@ def create_app(test_config=None):
 
         return jsonify({"success": True, "id": course.id})
 
-
     #### patch requests
-
 
     @app.route("/instruments/<int:instrument_id>", methods=["PATCH"])
     @requires_auth("patch:instruments")
     def update_instrument(payload, instrument_id):
         # get instrument by provided id
-        instrument_query = db.one_or_404(
+        instrument = db.one_or_404(
             db.select(Instrument).where(Instrument.id == instrument_id)
-        ).one_or_none()
-
-        instrument = instrument_query[0]
+        )
 
         try:
             # get request body
@@ -866,6 +831,7 @@ def create_app(test_config=None):
         removed_instructors = body.get("removed_instructors", None)
 
         new_instructors_list = None
+        removed_instructors_list = None
 
         if new_name:
             # update name if provided
@@ -873,18 +839,21 @@ def create_app(test_config=None):
 
         if new_instructors:
             # check list of instructors, if provided, against database and create dict with names and ids
+            instructors_dict = get_instructors_dict()
             new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
         if new_instructors_list:
             # add rows to association table for each instructor in dict
             for instructor in new_instructors_list:
                 instructor_join = InstructorInstrumentRelationship(
-                    instructor_id=instructors_dict[instructor], instrument_id=instrument.id
+                    instructor_id=instructors_dict[instructor],
+                    instrument_id=instrument.id,
                 )
                 instructor_join.insert()
 
         if removed_instructors:
             # check list of instructors to be deassociated from instrument, if provided, against database and create dict with names and ids
+            instructors_dict = get_instructors_dict()
             removed_instructors_list = check_instructors(
                 removed_instructors, instructors_dict
             )
@@ -898,7 +867,9 @@ def create_app(test_config=None):
                         InstructorInstrumentRelationship.instructor_id
                         == instructors_dict[instructor]
                     )
-                    .where(InstructorInstrumentRelationship.instrument_id == instrument_id)
+                    .where(
+                        InstructorInstrumentRelationship.instrument_id == instrument_id
+                    )
                 ).one_or_none()
 
                 if instructor_join_query is None:
@@ -924,23 +895,13 @@ def create_app(test_config=None):
 
         return jsonify({"success": True})
 
-
     @app.route("/instructors/<int:instructor_id>", methods=["PATCH"])
     @requires_auth("patch:instructors")
     def update_instructor(payload, instructor_id):
-        try:
-            # get instructor by provided id
-            instructor_query = db.session.execute(
-                db.select(Instructor).where(Instructor.id == instructor_id)
-            )
-
-            if instructor_query is None:
-                abort(404)
-
-        except:
-            abort(404)
-
-        instructor = instructor_query[0]
+        # get instructor by provided id
+        instructor = db.one_or_404(
+            db.select(Instructor).where(Instructor.id == instructor_id)
+        )
 
         try:
             # get request body
@@ -977,18 +938,21 @@ def create_app(test_config=None):
 
         if new_instruments:
             # check list of instruments, if provided, against database and create dict with names and ids
+            instruments_dict = get_instruments_dict()
             new_instruments_list = check_instruments(new_instruments, instruments_dict)
 
         if new_instruments_list:
             # add rows to association table for each instrument in dict
             for instrument in new_instruments_list:
                 instrument_join = InstructorInstrumentRelationship(
-                    instructor_id=instructor_id, instrument_id=instruments_dict[instrument]
+                    instructor_id=instructor_id,
+                    instrument_id=instruments_dict[instrument],
                 )
                 instrument_join.insert()
 
         if removed_instruments:
             # check list of instruments to be deassociated from instructor, if provided, against database and create dict with names and ids
+            instruments_dict = get_instruments_dict()
             removed_instruments_list = check_instruments(
                 removed_instruments, instruments_dict
             )
@@ -998,7 +962,9 @@ def create_app(test_config=None):
             for instrument in removed_instruments_list:
                 instrument_join_query = db.session.execute(
                     db.select(InstructorInstrumentRelationship)
-                    .where(InstructorInstrumentRelationship.instructor_id == instructor_id)
+                    .where(
+                        InstructorInstrumentRelationship.instructor_id == instructor_id
+                    )
                     .where(
                         InstructorInstrumentRelationship.instrument_id
                         == instruments_dict[instrument]
@@ -1035,7 +1001,9 @@ def create_app(test_config=None):
                 course_join_query = db.session.execute(
                     db.select(InstructorCourseRelationship)
                     .where(InstructorCourseRelationship.instructor_id == instructor_id)
-                    .where(InstructorCourseRelationship.course_id == courses_dict[course])
+                    .where(
+                        InstructorCourseRelationship.course_id == courses_dict[course]
+                    )
                 ).one_or_none()
 
             if course_join_query is None:
@@ -1061,16 +1029,11 @@ def create_app(test_config=None):
 
         return jsonify({"success": True})
 
-
     @app.route("/courses/<int:course_id>", methods=["PATCH"])
     @requires_auth("patch:courses")
     def update_course(payload, course_id):
         # get course by provided id
-        course_query = db.one_or_404(
-            db.select(Course).where(Course.id == course_id)
-        ).one_or_none()
-
-        course = course_query[0]
+        course = db.one_or_404(db.select(Course).where(Course.id == course_id))
 
         try:
             # get request body
@@ -1099,6 +1062,7 @@ def create_app(test_config=None):
 
         if new_instructors:
             # check list of instructors, if provided, against database and create dict with names and ids
+            instructors_dict = get_instructors_dict()
             new_instructors_list = check_instructors(new_instructors, instructors_dict)
 
         if new_instructors_list:
@@ -1111,6 +1075,7 @@ def create_app(test_config=None):
 
         if removed_instructors:
             # check list of instructors to be deassociated from course, if provided, against database and create dict with names and ids
+            instructors_dict = get_instructors_dict()
             removed_instructors_list = check_instructors(
                 removed_instructors, instructors_dict
             )
@@ -1141,20 +1106,20 @@ def create_app(test_config=None):
             except IntegrityError:
                 # throw error for duplicate name
                 raise BadInfoError(
-                    {"code": 422, "description": "A course by that name already exists!"},
+                    {
+                        "code": 422,
+                        "description": "A course by that name already exists!",
+                    },
                     422,
                 )
 
         return jsonify({"success": True})
 
-
     #### error handlers
-
 
     @app.errorhandler(400)
     def bad_request(error):
         return jsonify({"success": False, "error": 400, "message": "bad request"}), 400
-
 
     @app.errorhandler(404)
     def not_found(error):
@@ -1163,7 +1128,6 @@ def create_app(test_config=None):
             404,
         )
 
-
     @app.errorhandler(405)
     def method_not_allowed(error):
         return (
@@ -1171,19 +1135,21 @@ def create_app(test_config=None):
             405,
         )
 
-
     @app.errorhandler(422)
     def unprocessable(error):
-        return jsonify({"success": False, "error": 422, "message": "unprocessable"}), 422
-
+        return (
+            jsonify({"success": False, "error": 422, "message": "unprocessable"}),
+            422,
+        )
 
     @app.errorhandler(500)
     def server_error(error):
         return (
-            jsonify({"success": False, "error": 500, "message": "internal server error"}),
+            jsonify(
+                {"success": False, "error": 500, "message": "internal server error"}
+            ),
             500,
         )
-
 
     @app.errorhandler(BadInfoError)
     def bad_info(error):
@@ -1198,7 +1164,6 @@ def create_app(test_config=None):
             ),
             error.status_code,
         )
-
 
     @app.errorhandler(AuthError)
     def auth_error(error):
@@ -1215,6 +1180,7 @@ def create_app(test_config=None):
         )
 
     return app
+
 
 ### launch
 

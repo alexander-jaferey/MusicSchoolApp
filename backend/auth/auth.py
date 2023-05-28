@@ -125,13 +125,7 @@ def requires_auth(permission=""):
         @wraps(f)
         def wrapper(*args, **kwargs):
             token = get_token()
-            try:
-                payload = check_jwt(token)
-            except:
-                raise AuthError(
-                    {"description": "unable to authenticate"},
-                    401
-                )
+            payload = check_jwt(token)
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
 
