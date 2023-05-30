@@ -111,7 +111,8 @@ function Page({
         <div className="col-span-1 py-4">
           <h2 className="text-xl font-bold">Courses</h2>
           <ul className="py-2">
-            {Object.entries(data.courses_taught).map((entry: [string, string]) => (
+            {data.courses_taught[0] ? <div className="py-1">{data.courses_taught[0]}</div> :
+            Object.entries(data.courses_taught).map((entry: [string, string]) => (
               <li key={entry[0]} className="py-1">
                 <Link
                   className="text-green-800 hover:text-green-700"
