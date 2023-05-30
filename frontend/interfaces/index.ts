@@ -19,11 +19,14 @@ export type Instrument = {
 }
 
 export type Instructor = {
-  first_name: string
-  last_name: string
-  workdays: string[]
-  instruments: string[]
-  courses: string[]
+  success: Boolean
+  instructor_id?: string
+  name?: string
+  workdays?: Weekdays[]
+  instruments?: IndexedStringList
+  courses_taught?: IndexedStringList
+  error?: number
+  message?: string
 }
 
 export type Course = {
@@ -59,4 +62,14 @@ export type DecodedJwt = {
   azp: string
   scope: string
   permissions: string[]
+}
+
+export enum Weekdays {
+  Sun = "Sun",
+  Mon = "Mon",
+  Tue = "Tue",
+  Wed = "Wed",
+  Thu = "Thu",
+  Fri = "Fri",
+  Sat = "Sat"
 }
