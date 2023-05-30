@@ -230,15 +230,15 @@ def create_app(test_config=None):
 
     #### tests
 
-    @app.route("/test")
-    def test():
-        query = db.session.execute(db.select(Instructor).where(Instructor.first_name == "Jimi" and Instructor.last_name == "Hendrix")).one_or_none()
-        print(query)
+    #@app.route("/test")
+    #def test():
+        #query = db.session.execute(db.select(Instructor).where(Instructor.first_name == "Jimi" and Instructor.last_name == "Hendrix")).one_or_none()
+        #print(query)
 
-        if query is None:
-            return "query is none"
-        else:
-            return "query is not none"
+        #if query is None:
+            #return "query is none"
+        #else:
+            #return "query is not none"
 
 
     #### get requests
@@ -321,7 +321,7 @@ def create_app(test_config=None):
         return jsonify(
             {
                 "success": True,
-                "instrument id": id,
+                "instrument_id": id,
                 "instrument": name,
                 "instructors": instructors,
                 "courses": courses,
@@ -427,11 +427,11 @@ def create_app(test_config=None):
         return jsonify(
             {
                 "success": True,
-                "instructor id": id,
+                "instructor_id": id,
                 "name": name,
                 "workdays": workdays,
                 "instruments": instruments,
-                "courses taught": courses,
+                "courses_taught": courses,
             }
         )
 
@@ -526,7 +526,7 @@ def create_app(test_config=None):
             {
                 "success": True,
                 "id": id,
-                "course title": title,
+                "course_title": title,
                 "instrument": instrument,
                 "schedule": schedule,
                 "instructors": instructors,
