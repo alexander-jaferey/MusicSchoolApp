@@ -41,7 +41,7 @@ function Page({
   }
 
   return (
-    <Layout>
+    <Layout user={user} loading={isLoading}>
       <div className="pb-4 border-b-2">
         <h1 className="text-3xl">Instruments</h1>
       </div>

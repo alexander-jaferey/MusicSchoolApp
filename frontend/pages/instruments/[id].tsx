@@ -15,8 +15,8 @@ const dbURL = `${process.env.BACKEND_URL}/instruments/`;
 
 export async function getServerSideProps(context: {
   params: { id: Number };
-  req;
-  res;
+  req: any;
+  res: any;
 }) {
   const req = context.req;
   const res = context.res;
@@ -74,7 +74,7 @@ function Page({
 
   if (error) {
     return (
-      <Layout>
+      <Layout user={user} loading={isLoading}>
         <Error statusCode={error} title={errorMessage} />
       </Layout>
     );
