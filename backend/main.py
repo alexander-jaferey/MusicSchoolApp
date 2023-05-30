@@ -297,7 +297,7 @@ def create_app(test_config=None):
 
             # provide friendly text if no instructors are found
             if len(instructors) == 0:
-                instructors = f"There are currently no {name} instructors"
+                instructors[0] = f"There are currently no {name} instructors"
 
             courses = {}
             # get all courses associated with this instrument
@@ -309,7 +309,7 @@ def create_app(test_config=None):
 
             # provide friendly text if no courses are found
             if len(courses) == 0:
-                courses = f"There are currently no {name} courses"
+                courses[0] = f"There are currently no {name} courses"
 
         except:
             print(exc_info())
@@ -415,7 +415,7 @@ def create_app(test_config=None):
 
             # provide friendly text if no courses are found
             if len(courses) == 0:
-                courses = f"{instructor[0].name_short()} is not teaching any courses currently"
+                courses[0] = f"{instructor[0].name_short()} is not teaching any courses currently"
 
         except:
             print(exc_info())
@@ -515,7 +515,7 @@ def create_app(test_config=None):
 
             # provide friendly text if no instructors are found
             if len(instructors) == 0:
-                instructors = f"There are currently no instructors teaching {title}"
+                instructors[0] = f"There are currently no instructors teaching {title}"
 
         except:
             print(exc_info())
