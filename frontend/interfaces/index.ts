@@ -9,8 +9,13 @@ export type User = {
 }
 
 export type Instrument = {
-  instrument: string
-  instructors: string[]
+  success: Boolean
+  instrument_id?: string
+  instrument?: string
+  instructors?: IndexedStringList
+  courses?: IndexedStringList
+  error?: number
+  message?: string
 }
 
 export type Instructor = {
@@ -43,4 +48,15 @@ export type IndexedInstructorList = {
 
 export type IndexedCourseList = {
   [index: string]: IndexedStringList
+}
+
+export type DecodedJwt = {
+  iss: string
+  sub: string
+  aud: string[]
+  iat: string
+  exp: string
+  azp: string
+  scope: string
+  permissions: string[]
 }

@@ -63,7 +63,7 @@ class Tests(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
-        self.assertTrue(data["instrument id"])
+        self.assertTrue(data["instrument_id"])
         self.assertTrue(data["instrument"])
         self.assertTrue(len(data["instructors"]))
         self.assertTrue(len(data["courses"]))
@@ -87,11 +87,11 @@ class Tests(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
-        self.assertTrue(data["instructor id"])
+        self.assertTrue(data["instructor_id"])
         self.assertTrue(data["name"])
         self.assertTrue(len(data["workdays"]))
         self.assertTrue(data["instruments"])
-        self.assertTrue(data["courses taught"])
+        self.assertTrue(data["courses_taught"])
 
 
     # test for auth failure when getting individual instructor with no header
@@ -114,7 +114,7 @@ class Tests(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
         self.assertTrue(data["id"])
-        self.assertTrue(data["course title"])
+        self.assertTrue(data["course_title"])
         self.assertTrue(data["instrument"])
         self.assertTrue(len(data["schedule"]))
         self.assertTrue(data["instructors"])
@@ -242,7 +242,8 @@ class Tests(unittest.TestCase):
             json={"instrument": "Violin"}
         )
         data = json.loads(res.data)
-        instrument = db.session.execute(db.select(Instrument).where(Instrument.instrument == "Violin")).one_or_none()
+        with self.app.app_context():
+            instrument = db.session.execute(db.select(Instrument).where(Instrument.instrument == "Violin")).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
@@ -291,7 +292,8 @@ class Tests(unittest.TestCase):
             }
         )
         data = json.loads(res.data)
-        instructor = db.session.execute(db.select(Instructor).where(Instructor.first_name == "Thom" and Instructor.last_name == "Yorke")).one_or_none()
+        with self.app.app_context():
+            instructor = db.session.execute(db.select(Instructor).where(Instructor.first_name == "Thom" and Instructor.last_name == "Yorke")).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
@@ -352,7 +354,8 @@ class Tests(unittest.TestCase):
             }
         )
         data = json.loads(res.data)
-        course = db.session.execute(db.select(Course).where(Course.name == "Funk Guitar")).one_or_none()
+        with self.app.app_context():
+            course = db.session.execute(db.select(Course).where(Course.name == "Funk Guitar")).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["success"], True)
