@@ -30,10 +30,14 @@ export type Instructor = {
 }
 
 export type Course = {
-  title: string
-  instrument: string
-  schedule: string[]
-  instructors: string[]
+  success: Boolean
+  id?: string
+  course_title?: string
+  instrument?: {id: string, name: string}
+  schedule?: Weekdays[]
+  instructors?: IndexedStringList
+  error?: number
+  message?: string
 }
 
 export type InstructorInfo = {
