@@ -11,7 +11,7 @@ import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
 
-const dbURL = `${process.env.BACKEND_URL}/instructors/`;
+const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instructors/`;
 
 export async function getServerSideProps(context: {
   params: { id: Number };

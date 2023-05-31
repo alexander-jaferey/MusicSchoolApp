@@ -4,19 +4,19 @@ import {
   withPageAuthRequired,
 } from "@auth0/nextjs-auth0";
 import Layout from "../../components/layout";
-import { DecodedJwt, Instrument } from "../../interfaces";
+import { Course, DecodedJwt} from "../../interfaces";
 import React from "react";
-import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
+import { InferGetServerSidePropsType } from "next";
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
 
-const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instruments/`;
+const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/`;
 
 export async function getServerSideProps(context: {
-  params: { id: number };
-  req: NextApiRequest;
-  res: NextApiResponse;
+  params: { id: Number };
+  req: any;
+  res: any;
 }) {
   const req = context.req;
   const res = context.res;
@@ -26,7 +26,7 @@ export async function getServerSideProps(context: {
   const token: DecodedJwt = jwt_decode(accessToken);
   const permissions = token.permissions;
 
-  const error = permissions.includes("get:instruments") ? false : 403;
+  const error = permissions.includes("get:courses") ? false : 403;
 
   if (error) {
     const errorMessage: string = "You don't have permission to view this page";
@@ -43,7 +43,7 @@ export async function getServerSideProps(context: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  const data: Instrument = await response.json();
+  const data: Course = await response.json();
 
   if (data.success == false) {
     const error = data.error;
@@ -60,30 +60,20 @@ export async function getServerSideProps(context: {
   return {
     props: {
       data,
-      id,
       permissions,
       token,
-      accessToken,
     },
   };
 }
 
 function Page({
   data,
-  id,
   permissions,
   token,
-  accessToken,
   error,
   errorMessage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { user, isLoading } = useUser();
-
-  const handleClick = (e) => { //move this to API route
-    fetch(`/api/get-token`)
-    .then((response) => response.json())
-    .then((token) => console.log(token))
-  }
 
   if (error) {
     return (
@@ -94,27 +84,16 @@ function Page({
   }
   return (
     <Layout>
-      <div className="pb-4 border-b-2">
-        <h1 className="text-3xl">{data.instrument}</h1>
-        <button onClick={handleClick}>Delete</button>
+      <div className="grid grid-cols-2 pb-4 border-b-2">
+        <div className="col-span-1">
+          <h1 className="text-3xl">{data.course_title}</h1>
+        </div>
+        <div className="col-span-1 flex flex-row flex-auto pt-3 font-bold">
+          <div className="px-1">Instrument: </div>
+          <Link href={`/instruments/${data.instrument.id}`} className="text-green-800 hover:text-green-700">{data.instrument.name}</Link>
+        </div>
       </div>
       <div className="grid grid-cols-2">
-        <div className="col-span-1 py-4">
-          <h2 className="text-xl font-bold">Courses</h2>
-          <ul className="py-2">
-            {data.courses[0] ? <div className="py-1">{data.courses[0]}</div> :
-            Object.entries(data.courses).map((entry: [string, string]) => (
-              <li key={entry[0]} className="py-1">
-                <Link
-                  className="text-green-800 hover:text-green-700"
-                  href={`/courses/${entry[0]}`}
-                >
-                  {entry[1]}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
         <div className="col-span-1 py-4">
           <h2 className="text-xl font-bold">Instructors</h2>
           <ul className="py-2">
@@ -128,6 +107,14 @@ function Page({
                   {entry[1]}
                 </Link>
               </li>
+            ))}
+          </ul>
+        </div>
+        <div className="col-span-1 py-4">
+          <h2 className="text-xl font-bold">Schedule</h2>
+          <ul className="py-2">
+            {data.schedule.map((day) => (
+              <li key={day} className="py-1">{day}</li>
             ))}
           </ul>
         </div>
