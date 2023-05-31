@@ -6,7 +6,7 @@ import {
 import Layout from "../../components/layout";
 import { Course, DecodedJwt} from "../../interfaces";
 import React from "react";
-import { InferGetServerSidePropsType } from "next";
+import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
@@ -15,8 +15,8 @@ const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/`;
 
 export async function getServerSideProps(context: {
   params: { id: Number };
-  req: any;
-  res: any;
+  req: NextApiRequest;
+  res: NextApiResponse;
 }) {
   const req = context.req;
   const res = context.res;
