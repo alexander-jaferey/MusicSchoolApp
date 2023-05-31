@@ -5,7 +5,7 @@ import { IndexedInstructorList, InstructorInfo } from "../interfaces";
 import { useUser } from "@auth0/nextjs-auth0";
 import Pagination from "../components/pagination";
 
-const dbURL = `${process.env.BACKEND_URL}/instructors`;
+const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instructors`;
 
 type Data = {
   instructors: IndexedInstructorList;
