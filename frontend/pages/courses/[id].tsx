@@ -10,11 +10,12 @@ import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "ne
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
+import DeleteButton from "../../components/deleteButton";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses/`;
 
 export async function getServerSideProps(context: {
-  params: { id: Number };
+  params: { id: number };
   req: NextApiRequest;
   res: NextApiResponse;
 }) {
@@ -60,6 +61,7 @@ export async function getServerSideProps(context: {
   return {
     props: {
       data,
+      id,
       permissions,
       token,
     },
@@ -68,8 +70,8 @@ export async function getServerSideProps(context: {
 
 function Page({
   data,
+  id,
   permissions,
-  token,
   error,
   errorMessage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -94,7 +96,7 @@ function Page({
         </div>
       </div>
       <div className="grid grid-cols-2">
-        <div className="col-span-1 py-4">
+        <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Instructors</h2>
           <ul className="py-2">
             {data.instructors[0] ? <div className="py-1">{data.instructors[0]}</div> :
@@ -110,7 +112,7 @@ function Page({
             ))}
           </ul>
         </div>
-        <div className="col-span-1 py-4">
+        <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Schedule</h2>
           <ul className="py-2">
             {data.schedule.map((day) => (
@@ -119,6 +121,9 @@ function Page({
           </ul>
         </div>
       </div>
+      {permissions.includes("delete:courses") ?
+        <DeleteButton id={id} entity="courses" /> : <></>
+      }
     </Layout>
   );
 }

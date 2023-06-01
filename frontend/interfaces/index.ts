@@ -9,7 +9,7 @@ export type User = {
 }
 
 export type Instrument = {
-  success: Boolean
+  success: boolean
   instrument_id?: string
   instrument?: string
   instructors?: IndexedStringList
@@ -19,7 +19,7 @@ export type Instrument = {
 }
 
 export type Instructor = {
-  success: Boolean
+  success: boolean
   instructor_id?: string
   name?: string
   workdays?: Weekdays[]
@@ -30,7 +30,7 @@ export type Instructor = {
 }
 
 export type Course = {
-  success: Boolean
+  success: boolean
   id?: string
   course_title?: string
   instrument?: {id: string, name: string}
@@ -66,6 +66,13 @@ export type DecodedJwt = {
   azp: string
   scope: string
   permissions: string[]
+}
+
+export type Deleted = {
+  success: boolean
+  deleted?: number
+  error?: number
+  message?: string
 }
 
 export enum Weekdays {

@@ -10,11 +10,12 @@ import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "ne
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
+import DeleteButton from "../../components/deleteButton";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instructors/`;
 
 export async function getServerSideProps(context: {
-  params: { id: Number };
+  params: { id: number };
   req: NextApiRequest;
   res: NextApiResponse;
 }) {
@@ -60,6 +61,7 @@ export async function getServerSideProps(context: {
   return {
     props: {
       data,
+      id,
       permissions,
     },
   };
@@ -67,6 +69,8 @@ export async function getServerSideProps(context: {
 
 function Page({
   data,
+  id,
+  permissions,
   error,
   errorMessage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -80,7 +84,7 @@ function Page({
     );
   }
   return (
-    <Layout>
+    <Layout user={user} loading={isLoading}>
       <div className="grid grid-cols-2 pb-4 border-b-2">
         <div className="col-span-1">
           <h1 className="text-3xl">{data.name}</h1>
@@ -93,7 +97,7 @@ function Page({
         </div>
       </div>
       <div className="grid grid-cols-2">
-        <div className="col-span-1 py-4">
+        <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Instruments</h2>
           <ul className="py-2">
             {Object.entries(data.instruments).map((entry: [string, string]) => (
@@ -108,7 +112,7 @@ function Page({
             ))}
           </ul>
         </div>
-        <div className="col-span-1 py-4">
+        <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Courses</h2>
           <ul className="py-2">
             {data.courses_taught[0] ? <div className="py-1">{data.courses_taught[0]}</div> :
@@ -125,6 +129,9 @@ function Page({
           </ul>
         </div>
       </div>
+      {permissions.includes("delete:instructors") ?
+        <DeleteButton id={id} entity="instructors" /> : <></>
+      }
     </Layout>
   );
 }

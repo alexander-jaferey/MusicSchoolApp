@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }) {
 
   return (
     <UserProvider user={user}>
-      <Component {...pageProps} />
+      <Component  {...pageProps} />
     </UserProvider>
   )
 }
