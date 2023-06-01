@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import Header from './header'
+import { Alert } from './Alert'
 
 type LayoutProps = {
   user?: any
@@ -12,9 +13,14 @@ const Layout = ({ user, loading = false, children }: LayoutProps) => {
     <>
       <Head>
         <title>MusicSchoolApp</title>
+
+        {/* eslint-disable-next-line @next/next/no-css-tags */}
+        <link href="//netdna.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
       </Head>
 
       <Header user={user} loading={loading} />
+      <Alert id="main"/>
 
       <main className="m-6 text-zinc-800 py-4 px-6 justify-between grid grid-cols-4 font-global">
         <div className="col-span-1"></div>

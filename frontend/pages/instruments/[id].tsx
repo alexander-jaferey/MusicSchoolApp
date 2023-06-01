@@ -4,12 +4,15 @@ import {
   withPageAuthRequired,
 } from "@auth0/nextjs-auth0";
 import Layout from "../../components/layout";
-import { DecodedJwt, Instrument } from "../../interfaces";
+import { DecodedJwt, Deleted, Instrument } from "../../interfaces";
 import React from "react";
 import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
+import { alertService } from "../../services"
+import { useRouter } from "next/router";
+import DeleteButton from "../../components/deleteButton";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instruments/`;
 
@@ -72,18 +75,10 @@ function Page({
   data,
   id,
   permissions,
-  token,
-  accessToken,
   error,
   errorMessage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { user, isLoading } = useUser();
-
-  const handleClick = (e) => { //move this to API route
-    fetch(`/api/get-token`)
-    .then((response) => response.json())
-    .then((token) => console.log(token))
-  }
 
   if (error) {
     return (
@@ -93,13 +88,12 @@ function Page({
     );
   }
   return (
-    <Layout>
+    <Layout user={user} loading={isLoading}>
       <div className="pb-4 border-b-2">
         <h1 className="text-3xl">{data.instrument}</h1>
-        <button onClick={handleClick}>Delete</button>
       </div>
       <div className="grid grid-cols-2">
-        <div className="col-span-1 py-4">
+        <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Courses</h2>
           <ul className="py-2">
             {data.courses[0] ? <div className="py-1">{data.courses[0]}</div> :
@@ -115,7 +109,7 @@ function Page({
             ))}
           </ul>
         </div>
-        <div className="col-span-1 py-4">
+        <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Instructors</h2>
           <ul className="py-2">
             {data.instructors[0] ? <div className="py-1">{data.instructors[0]}</div> :
@@ -132,6 +126,12 @@ function Page({
           </ul>
         </div>
       </div>
+      {permissions.includes("patch:instruments") ?
+        <button className="rounded mr-2 bg-green-800 hover:bg-green-700 text-zinc-200 p-2" onClick={() => console.log("test")}>Edit</button> : <></>
+      }
+      {permissions.includes("delete:instruments") ?
+        <DeleteButton id={id} entity="instruments" /> : <></>
+      }
     </Layout>
   );
 }
