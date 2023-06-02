@@ -85,7 +85,7 @@ function Page({
     );
   }
   return (
-    <Layout>
+    <Layout user={user} loading={isLoading}>
       <div className="grid grid-cols-2 pb-4 border-b-2">
         <div className="col-span-1">
           <h1 className="text-3xl">{data.course_title}</h1>
