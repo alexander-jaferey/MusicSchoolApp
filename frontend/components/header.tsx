@@ -6,7 +6,7 @@ type HeaderProps = {
 }
 
 const Header = ({ user, loading }: HeaderProps) => (
-  <header className="bg-zinc-800 text-zinc-200 py-4 px-6 justify-between grid grid-cols-5 font-global">
+  <header className="bg-zinc-800 text-zinc-200 hover:text-zinc-300 py-4 px-6 justify-between grid grid-cols-5 font-global">
     <div className="container contents max-w-xl">
       <div className="col-span-1 ml-4">
       </div>
