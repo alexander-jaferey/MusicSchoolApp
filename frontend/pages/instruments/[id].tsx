@@ -4,17 +4,25 @@ import {
   withPageAuthRequired,
 } from "@auth0/nextjs-auth0";
 import Layout from "../../components/layout";
-import { DecodedJwt, Deleted, Instrument } from "../../interfaces";
+import { DecodedJwt, IndexedStringList } from "../../interfaces";
 import React from "react";
 import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
-import { alertService } from "../../services"
-import { useRouter } from "next/router";
 import DeleteButton from "../../components/deleteButton";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instruments/`;
+
+type Data = {
+  success: boolean
+  instrument_id?: string
+  instrument?: string
+  instructors?: IndexedStringList
+  courses?: IndexedStringList
+  error?: number
+  message?: string
+}
 
 export async function getServerSideProps(context: {
   params: { id: number };
@@ -46,7 +54,7 @@ export async function getServerSideProps(context: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  const data: Instrument = await response.json();
+  const data: Data = await response.json();
 
   if (data.success == false) {
     const error = data.error;

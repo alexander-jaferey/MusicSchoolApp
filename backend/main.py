@@ -247,11 +247,16 @@ def create_app(test_config=None):
 
     @app.route("/instruments")
     def get_instruments():
+        try:
+            per_page = int(request.args.get("per_page", 10))
+        except ValueError:
+            abort(404)
+
         instruments = {}
         try:
             # get paginated list of instruments
             instrument_query = db.paginate(
-                db.select(Instrument).order_by(Instrument.id), per_page=10
+                db.select(Instrument).order_by(Instrument.id), per_page=per_page
             )
             if instrument_query is None:
                 abort(404)
@@ -332,11 +337,17 @@ def create_app(test_config=None):
 
     @app.route("/instructors")
     def get_instructors():
+        try:
+            per_page = int(request.args.get("per_page", 8))
+        except ValueError:
+            print(exc_info())
+            abort(404)
+
         instructors = {}
         try:
             # get paginated list of instructors
             instructor_query = db.paginate(
-                db.select(Instructor).order_by(Instructor.id), per_page=8
+                db.select(Instructor).order_by(Instructor.id), per_page=per_page
             )
             if instructor_query is None:
                 abort(404)
@@ -358,7 +369,7 @@ def create_app(test_config=None):
                 for instrument in instruments_query:
                     instruments.append(instrument[0].instrument)
 
-                info["instructor"] = instructor.name_short()
+                info["instructor"] = instructor.name()
                 info["instruments"] = instruments
                 # add individual instructor dict to main dict
                 instructors[id] = info
@@ -439,12 +450,17 @@ def create_app(test_config=None):
 
     @app.route("/courses")
     def get_courses():
+        try:
+            per_page = int(request.args.get("per_page", 5))
+        except ValueError:
+            abort(404)
+
         courses = {}
         try:
             # get paginated list of instruments
             instrument_query = db.paginate(
                 db.select(Instrument).order_by(Instrument.id),
-                per_page=5,
+                per_page=per_page,
             )
             if instrument_query is None:
                 abort(404)
