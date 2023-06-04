@@ -45,6 +45,14 @@ export type InstructorInfo = {
   instruments: string[]
 }
 
+export type InstructorsQuery = {
+  instructors: IndexedInstructorList;
+  success: boolean;
+  total_instructors: number;
+  current_page: number;
+  total_pages: number;
+};
+
 export type IndexedStringList = {
   [index: string]: string
 }

@@ -4,7 +4,7 @@ import {
   withPageAuthRequired,
 } from "@auth0/nextjs-auth0";
 import Layout from "../../components/layout";
-import { DecodedJwt, Instructor } from "../../interfaces";
+import { DecodedJwt, IndexedStringList, Weekdays } from "../../interfaces";
 import React from "react";
 import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
 import jwt_decode from "jwt-decode";
@@ -13,6 +13,17 @@ import Link from "next/link";
 import DeleteButton from "../../components/deleteButton";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instructors/`;
+
+type Data = {
+  success: boolean
+  instructor_id?: string
+  name?: string
+  workdays?: Weekdays[]
+  instruments?: IndexedStringList
+  courses_taught?: IndexedStringList
+  error?: number
+  message?: string
+}
 
 export async function getServerSideProps(context: {
   params: { id: number };
@@ -44,7 +55,7 @@ export async function getServerSideProps(context: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  const data: Instructor = await response.json();
+  const data: Data = await response.json();
 
   if (data.success == false) {
     const error = data.error;
