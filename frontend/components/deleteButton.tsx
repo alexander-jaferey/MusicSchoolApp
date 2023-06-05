@@ -31,7 +31,7 @@ const DeleteButton = ({ id, entity, className }: DeleteProps) => {
     };
 
   return (
-    <button className={`${className} rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 p-2`} onClick={handleDelete}>Delete</button>
+    <button className={`${className} rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-zinc-100 p-2`} onClick={handleDelete}>Delete</button>
   )
 }
 

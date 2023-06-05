@@ -45,14 +45,16 @@ const InstrumentForm = ({ method, instructors, values } : InstrumentFormProps) =
     const result = await response.json();
     console.log(result)
 
+    const action = (method === "PATCH") ? "update": "add"
+
     if (result.error) {
       const error = result.error;
       const errorMessage = result.message;
 
-      alertService.error(`Could not ${method.toLowerCase} instrument (error ${error}: ${errorMessage})`, { id: "main" })
+      alertService.error(`Could not ${action} instrument (error ${error}: ${errorMessage})`, { id: "main" })
     }
     else {
-      alertService.success(`Instrument ${method.toLowerCase}ed`)
+      alertService.success(`Instrument ${action}ed`)
       setTimeout(function() {
         router.push("/")
       }, 1000)
@@ -69,13 +71,13 @@ const InstrumentForm = ({ method, instructors, values } : InstrumentFormProps) =
         <div className="max-h-36 max-w-fit overflow-y-scroll">
           {Object.entries(instructors).map(
             (entry => (
-              <><input type="checkbox" name="instructor" id="instructor" value={entry[1].instructor} />
-              <label htmlFor={entry[1].instructor} className="px-2">{entry[1].instructor}</label><br /></>
+              <><input type="checkbox" name="instructor" id="instructor" key={entry[1].instructor} value={entry[1].instructor} />
+              <label key={entry[0]} htmlFor={entry[1].instructor} className="px-2">{entry[1].instructor}</label><br /></>
             ))
           )}
           </div>
       </fieldset>
-      <input type="submit" value="Submit" className="rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 p-2 my-3"/>
+      <input type="submit" value="Submit" className="rounded bg-green-800 hover:bg-green-700 text-zinc-200 hover:text-zinc-100 p-2 my-3"/>
     </form> 
   );
 };
