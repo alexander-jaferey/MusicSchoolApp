@@ -4,25 +4,20 @@ import {
   withPageAuthRequired,
 } from "@auth0/nextjs-auth0";
 import Layout from "../../components/layout";
-import { DecodedJwt, IndexedStringList } from "../../interfaces";
+import { DecodedJwt, Instrument } from "../../interfaces";
 import React from "react";
-import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
+import {
+  InferGetServerSidePropsType,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
 import DeleteButton from "../../components/deleteButton";
+import { useRouter } from "next/router";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instruments/`;
-
-type Data = {
-  success: boolean
-  instrument_id?: string
-  instrument?: string
-  instructors?: IndexedStringList
-  courses?: IndexedStringList
-  error?: number
-  message?: string
-}
 
 export async function getServerSideProps(context: {
   params: { id: number };
@@ -54,7 +49,7 @@ export async function getServerSideProps(context: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  const data: Data = await response.json();
+  const data: Instrument = await response.json();
 
   if (data.success == false) {
     const error = data.error;
@@ -73,8 +68,6 @@ export async function getServerSideProps(context: {
       data,
       id,
       permissions,
-      token,
-      accessToken,
     },
   };
 }
@@ -87,6 +80,7 @@ function Page({
   errorMessage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { user, isLoading } = useUser();
+  const router = useRouter();
 
   if (error) {
     return (
@@ -104,42 +98,59 @@ function Page({
         <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Courses</h2>
           <ul className="py-2">
-            {data.courses[0] ? <div className="py-1">{data.courses[0]}</div> :
-            Object.entries(data.courses).map((entry: [string, string]) => (
-              <li key={entry[0]} className="py-1">
-                <Link
-                  className="text-green-800 hover:text-green-700"
-                  href={`/courses/${entry[0]}`}
-                >
-                  {entry[1]}
-                </Link>
-              </li>
-            ))}
+            {data.courses[0] ? (
+              <div className="py-1">{data.courses[0]}</div>
+            ) : (
+              Object.entries(data.courses).map((entry: [string, string]) => (
+                <li key={entry[0]} className="py-1">
+                  <Link
+                    className="text-green-800 hover:text-green-700"
+                    href={`/courses/${entry[0]}`}
+                  >
+                    {entry[1]}
+                  </Link>
+                </li>
+              ))
+            )}
           </ul>
         </div>
         <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Instructors</h2>
           <ul className="py-2">
-            {data.instructors[0] ? <div className="py-1">{data.instructors[0]}</div> :
-            Object.entries(data.instructors).map((entry: [string, string]) => (
-              <li key={entry[0]} className="py-1">
-                <Link
-                  className="text-green-800 hover:text-green-700"
-                  href={`/instructors/${entry[0]}`}
-                >
-                  {entry[1]}
-                </Link>
-              </li>
-            ))}
+            {data.instructors[0] ? (
+              <div className="py-1">{data.instructors[0]}</div>
+            ) : (
+              Object.entries(data.instructors).map(
+                (entry: [string, string]) => (
+                  <li key={entry[0]} className="py-1">
+                    <Link
+                      className="text-green-800 hover:text-green-700"
+                      href={`/instructors/${entry[0]}`}
+                    >
+                      {entry[1]}
+                    </Link>
+                  </li>
+                )
+              )
+            )}
           </ul>
         </div>
       </div>
-      {permissions.includes("patch:instruments") ?
-        <button className="rounded mr-2 bg-green-800 hover:bg-green-700 text-zinc-200 p-2" onClick={() => console.log("test")}>Edit</button> : <></>
-      }
-      {permissions.includes("delete:instruments") ?
-        <DeleteButton id={id} entity="instruments" /> : <></>
-      }
+      {permissions.includes("patch:instruments") ? (
+        <button
+          className="rounded mr-2 bg-green-800 hover:bg-green-700 text-zinc-200 p-2"
+          onClick={() => router.push(`/instruments/${id}/edit`)}
+        >
+          Edit
+        </button>
+      ) : (
+        <></>
+      )}
+      {permissions.includes("delete:instruments") ? (
+        <DeleteButton id={id} entity="instruments" />
+      ) : (
+        <></>
+      )}
     </Layout>
   );
 }
