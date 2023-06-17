@@ -8,15 +8,10 @@ type InstrumentFormProps = {
   values?: Instrument
 };
 
-type InstrumentSubmission = {
-  instrument: string
-  instructors?: string[]
-}
-
 const InstrumentForm = ({ method, instructors, values } : InstrumentFormProps) => {
+  const router = useRouter();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const router = useRouter();
     const instrument = e.target.instrument.value;
     const instructorOptions = e.target.instructor;
     let selectedInstructors = [];
@@ -65,7 +60,7 @@ const InstrumentForm = ({ method, instructors, values } : InstrumentFormProps) =
   return (
     <form onSubmit={handleSubmit}>
       <label htmlFor="instrument" className="text-xl">Instrument</label><br />
-      <input type="text" name="instrument" id="instrument" className="mb-3"/>
+      <input type="text" name="instrument" id="instrument" className="mb-3" />
       <fieldset>
         <legend className="text-xl">Instructors</legend>
         <div className="max-h-36 max-w-fit overflow-y-scroll">

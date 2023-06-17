@@ -1,25 +1,17 @@
 import Layout from "../components/layout";
 import { InferGetServerSidePropsType } from "next";
 import Link from "next/link";
-import { IndexedCourseList, IndexedStringList } from "../interfaces";
+import { CoursesQuery, IndexedCourseList, IndexedStringList } from "../interfaces";
 import { useUser } from "@auth0/nextjs-auth0";
 import Pagination from "../components/pagination";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses`;
 
-type Data = {
-  courses: IndexedCourseList;
-  success: boolean;
-  total_instruments: number;
-  current_page: number;
-  total_pages: number;
-};
-
 export async function getServerSideProps(context: { query: { page: number } }) {
   const page = context.query.page || 1;
 
   const res = await fetch(`${dbURL}?page=${page}`);
-  const data: Data = await res.json();
+  const data: CoursesQuery = await res.json();
 
   return {
     props: {
