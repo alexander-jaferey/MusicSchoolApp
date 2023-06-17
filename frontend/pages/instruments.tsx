@@ -1,20 +1,12 @@
 import Layout from "../components/layout";
 import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
 import Link from "next/link";
-import { DecodedJwt, IndexedStringList } from "../interfaces";
+import { DecodedJwt, IndexedStringList, InstrumentsQuery } from "../interfaces";
 import { getAccessToken, useUser } from "@auth0/nextjs-auth0";
 import Pagination from "../components/pagination";
 import jwt_decode from 'jwt-decode';
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instruments`;
-
-type Data = {
-  instruments: IndexedStringList;
-  success: boolean;
-  total_instruments: number;
-  current_page: number;
-  total_pages: number;
-};
 
 export async function getServerSideProps(context: { query: { page: number }; req: NextApiRequest; res: NextApiResponse }) {
   const page = context.query.page || 1;
@@ -22,7 +14,7 @@ export async function getServerSideProps(context: { query: { page: number }; req
   const res = context.res;
 
   const response = await fetch(`${dbURL}?page=${page}`);
-  const data: Data = await response.json();
+  const data: InstrumentsQuery = await response.json();
 
   if (req.cookies.appSession) {
     const accessToken = (await getAccessToken(req, res)).accessToken
