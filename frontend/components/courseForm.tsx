@@ -114,9 +114,7 @@ const CourseForm = ({
                 id="weekday"
                 key={weekday}
                 value={weekday}
-                defaultChecked={
-                  scheduleArray.includes(weekday) ? true : false
-                }
+                defaultChecked={scheduleArray.includes(weekday) ? true : false}
               />
               <label
                 key={`${weekday}-label`}

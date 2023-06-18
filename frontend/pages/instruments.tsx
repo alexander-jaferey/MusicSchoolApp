@@ -1,14 +1,22 @@
 import Layout from "../components/layout";
-import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
+import {
+  InferGetServerSidePropsType,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
 import Link from "next/link";
 import { DecodedJwt, IndexedStringList, InstrumentsQuery } from "../interfaces";
 import { getAccessToken, useUser } from "@auth0/nextjs-auth0";
 import Pagination from "../components/pagination";
-import jwt_decode from 'jwt-decode';
+import jwt_decode from "jwt-decode";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instruments`;
 
-export async function getServerSideProps(context: { query: { page: number }; req: NextApiRequest; res: NextApiResponse }) {
+export async function getServerSideProps(context: {
+  query: { page: number };
+  req: NextApiRequest;
+  res: NextApiResponse;
+}) {
   const page = context.query.page || 1;
   const req = context.req;
   const res = context.res;
@@ -17,22 +25,21 @@ export async function getServerSideProps(context: { query: { page: number }; req
   const data: InstrumentsQuery = await response.json();
 
   if (req.cookies.appSession) {
-    const accessToken = (await getAccessToken(req, res)).accessToken
-    const token: DecodedJwt = jwt_decode(accessToken)
-    const permissions = token.permissions
+    const accessToken = (await getAccessToken(req, res)).accessToken;
+    const token: DecodedJwt = jwt_decode(accessToken);
+    const permissions = token.permissions;
     return {
       props: {
         data,
-        permissions
+        permissions,
       },
     };
-  }
-  else {
-    const permissions = []
+  } else {
+    const permissions = [];
     return {
       props: {
         data,
-        permissions
+        permissions,
       },
     };
   }
@@ -54,9 +61,16 @@ function Page({
   return (
     <Layout user={user} loading={isLoading}>
       <div className="pb-4 border-b-2">
-        {permissions.includes("post:instruments") ? 
-          <Link href="/instruments/new" className="rounded mr-2 bg-green-800 hover:bg-green-700 text-zinc-200 hover:text-zinc-100 hover:no-underline p-2 float-right">New Instrument</Link> : <></>
-        }
+        {permissions.includes("post:instruments") ? (
+          <Link
+            href="/instruments/new"
+            className="rounded mr-2 bg-green-800 hover:bg-green-700 text-zinc-200 hover:text-zinc-100 hover:no-underline p-2 float-right"
+          >
+            New Instrument
+          </Link>
+        ) : (
+          <></>
+        )}
         <h1 className="text-3xl">Instruments</h1>
       </div>
       <div>

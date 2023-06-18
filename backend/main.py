@@ -1,22 +1,15 @@
 ### imports
 from sys import exc_info
 
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy import func
-from flask import Flask, request, abort, jsonify
-from flask_migrate import Migrate
-from flask_cors import CORS
-
+from auth.auth import AuthError, requires_auth
 from config import db_url
-from auth.auth import requires_auth, AuthError
-from db.models import (
-    db,
-    Instructor,
-    Course,
-    Instrument,
-    InstructorCourseRelationship,
-    InstructorInstrumentRelationship,
-)
+from db.models import (Course, Instructor, InstructorCourseRelationship,
+                       InstructorInstrumentRelationship, Instrument, db)
+from flask import Flask, abort, jsonify, request
+from flask_cors import CORS
+from flask_migrate import Migrate
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
 
 
 def create_app(test_config=None):
@@ -230,16 +223,15 @@ def create_app(test_config=None):
 
     #### tests
 
-    #@app.route("/test")
-    #def test():
-        #query = db.session.execute(db.select(Instructor).where(Instructor.first_name == "Jimi" and Instructor.last_name == "Hendrix")).one_or_none()
-        #print(query)
+    # @app.route("/test")
+    # def test():
+    # query = db.session.execute(db.select(Instructor).where(Instructor.first_name == "Jimi" and Instructor.last_name == "Hendrix")).one_or_none()
+    # print(query)
 
-        #if query is None:
-            #return "query is none"
-        #else:
-            #return "query is not none"
-
+    # if query is None:
+    # return "query is none"
+    # else:
+    # return "query is not none"
 
     #### get requests
 
@@ -426,7 +418,9 @@ def create_app(test_config=None):
 
             # provide friendly text if no courses are found
             if len(courses) == 0:
-                courses[0] = f"{instructor[0].name_short()} is not teaching any courses currently"
+                courses[
+                    0
+                ] = f"{instructor[0].name_short()} is not teaching any courses currently"
 
         except:
             print(exc_info())

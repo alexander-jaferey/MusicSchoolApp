@@ -1,7 +1,20 @@
-import { getAccessToken, useUser, withPageAuthRequired } from "@auth0/nextjs-auth0";
-import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
-import { CoursesQuery, DecodedJwt, Instructor, InstrumentsQuery } from "../../../interfaces";
-import jwt_decode from 'jwt-decode';
+import {
+  getAccessToken,
+  useUser,
+  withPageAuthRequired,
+} from "@auth0/nextjs-auth0";
+import {
+  InferGetServerSidePropsType,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
+import {
+  CoursesQuery,
+  DecodedJwt,
+  Instructor,
+  InstrumentsQuery,
+} from "../../../interfaces";
+import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Layout from "../../../components/layout";
 import InstructorForm from "../../../components/instructorForm";
@@ -53,10 +66,10 @@ export async function getServerSideProps(context: {
   }
 
   const instrumentRes = await fetch(`${dbURL}/instruments?per_page=1000`);
-  const instrumentData : InstrumentsQuery = await instrumentRes.json();
+  const instrumentData: InstrumentsQuery = await instrumentRes.json();
   const instruments = instrumentData.instruments;
 
-  const courseRes = await fetch (`${dbURL}/courses?per_page=1000`);
+  const courseRes = await fetch(`${dbURL}/courses?per_page=1000`);
   const courseData: CoursesQuery = await courseRes.json();
   const courses = courseData.courses;
 
@@ -64,9 +77,9 @@ export async function getServerSideProps(context: {
     props: {
       data,
       instruments,
-      courses
-    }
-  }
+      courses,
+    },
+  };
 }
 
 function Page({
@@ -74,7 +87,7 @@ function Page({
   instruments,
   courses,
   error,
-  errorMessage
+  errorMessage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { user, isLoading } = useUser();
 
@@ -88,9 +101,14 @@ function Page({
 
   return (
     <Layout user={user} loading={isLoading}>
-      <InstructorForm method="PATCH" instruments={instruments} courses={courses} values={data} />
+      <InstructorForm
+        method="PATCH"
+        instruments={instruments}
+        courses={courses}
+        values={data}
+      />
     </Layout>
-  )
+  );
 }
 
-export default withPageAuthRequired(Page)
+export default withPageAuthRequired(Page);

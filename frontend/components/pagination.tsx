@@ -7,7 +7,12 @@ type PaginationProps = {
   pages: number[];
 };
 
-const Pagination = ({ target, currentPage, totalPages, pages }: PaginationProps) => (
+const Pagination = ({
+  target,
+  currentPage,
+  totalPages,
+  pages,
+}: PaginationProps) => (
   <div>
     <nav className="text-green-800 space-x-5">
       <Link

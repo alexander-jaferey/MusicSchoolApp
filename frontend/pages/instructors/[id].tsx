@@ -6,7 +6,11 @@ import {
 import Layout from "../../components/layout";
 import { DecodedJwt, Instructor } from "../../interfaces";
 import React from "react";
-import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
+import {
+  InferGetServerSidePropsType,
+  NextApiRequest,
+  NextApiResponse,
+} from "next";
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
@@ -94,7 +98,10 @@ function Page({
         <div className="col-span-1 flex flex-row flex-auto pt-3">
           <div className="font-bold px-1">Workdays: </div>
           {data.workdays.map((day: string, i: number) => (
-            <div key={i}>{i > 0 && ", "}{day}</div>
+            <div key={i}>
+              {i > 0 && ", "}
+              {day}
+            </div>
           ))}
         </div>
       </div>
@@ -117,17 +124,22 @@ function Page({
         <div className="col-span-1 py-4 px-1">
           <h2 className="text-xl font-bold">Courses</h2>
           <ul className="py-2">
-            {data.courses_taught[0] ? <div className="py-1">{data.courses_taught[0]}</div> :
-            Object.entries(data.courses_taught).map((entry: [string, string]) => (
-              <li key={entry[0]} className="py-1">
-                <Link
-                  className="text-green-800 hover:text-green-700"
-                  href={`/courses/${entry[0]}`}
-                >
-                  {entry[1]}
-                </Link>
-              </li>
-            ))}
+            {data.courses_taught[0] ? (
+              <div className="py-1">{data.courses_taught[0]}</div>
+            ) : (
+              Object.entries(data.courses_taught).map(
+                (entry: [string, string]) => (
+                  <li key={entry[0]} className="py-1">
+                    <Link
+                      className="text-green-800 hover:text-green-700"
+                      href={`/courses/${entry[0]}`}
+                    >
+                      {entry[1]}
+                    </Link>
+                  </li>
+                )
+              )
+            )}
           </ul>
         </div>
       </div>
@@ -141,9 +153,11 @@ function Page({
       ) : (
         <></>
       )}
-      {permissions.includes("delete:instructors") ?
-        <DeleteButton id={id} entity="instructors" /> : <></>
-      }
+      {permissions.includes("delete:instructors") ? (
+        <DeleteButton id={id} entity="instructors" />
+      ) : (
+        <></>
+      )}
     </Layout>
   );
 }
