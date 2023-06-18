@@ -10,7 +10,11 @@ import {
   InstrumentsQuery,
 } from "../../../interfaces";
 import jwt_decode from "jwt-decode";
-import { getAccessToken, useUser, withPageAuthRequired } from "@auth0/nextjs-auth0";
+import {
+  getAccessToken,
+  useUser,
+  withPageAuthRequired,
+} from "@auth0/nextjs-auth0";
 import Error from "next/error";
 import Layout from "../../../components/layout";
 import CourseForm from "../../../components/courseForm";
@@ -97,9 +101,14 @@ function Page({
 
   return (
     <Layout user={user} loading={isLoading}>
-      <CourseForm method="PATCH" instruments={instruments} instructors={instructors} values={data} />
+      <CourseForm
+        method="PATCH"
+        instruments={instruments}
+        instructors={instructors}
+        values={data}
+      />
     </Layout>
-  )
+  );
 }
 
 export default withPageAuthRequired(Page);

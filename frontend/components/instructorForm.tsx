@@ -120,9 +120,7 @@ const InstructorForm = ({
                 id="weekday"
                 key={weekday}
                 value={weekday}
-                defaultChecked={
-                  workdaysArray.includes(weekday) ? true : false
-                }
+                defaultChecked={workdaysArray.includes(weekday) ? true : false}
               />
               <label
                 key={`${weekday}-label`}
