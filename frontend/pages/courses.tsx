@@ -1,27 +1,46 @@
 import Layout from "../components/layout";
-import { InferGetServerSidePropsType } from "next";
+import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
 import Link from "next/link";
-import { CoursesQuery, IndexedCourseList, IndexedStringList } from "../interfaces";
-import { useUser } from "@auth0/nextjs-auth0";
+import { CoursesQuery, DecodedJwt, IndexedCourseList, IndexedStringList } from "../interfaces";
+import { getAccessToken, useUser } from "@auth0/nextjs-auth0";
 import Pagination from "../components/pagination";
+import jwt_decode from 'jwt-decode';
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/courses`;
 
-export async function getServerSideProps(context: { query: { page: number } }) {
+export async function getServerSideProps(context: { query: { page: number }; req: NextApiRequest; res: NextApiResponse }) {
   const page = context.query.page || 1;
+  const req = context.req;
+  const res = context.res;
 
-  const res = await fetch(`${dbURL}?page=${page}`);
-  const data: CoursesQuery = await res.json();
+  const response = await fetch(`${dbURL}?page=${page}`);
+  const data: CoursesQuery = await response.json();
 
-  return {
-    props: {
-      data,
-    },
-  };
+  if (req.cookies.appSession) {
+    const accessToken = (await getAccessToken(req, res)).accessToken
+    const token: DecodedJwt = jwt_decode(accessToken)
+    const permissions = token.permissions
+    return {
+      props: {
+        data,
+        permissions
+      },
+    };
+  }
+  else {
+    const permissions = []
+    return {
+      props: {
+        data,
+        permissions
+      },
+    };
+  }
 }
 
 function Page({
   data,
+  permissions
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { user, isLoading } = useUser();
 
@@ -35,6 +54,9 @@ function Page({
   return (
     <Layout user={user} loading={isLoading}>
       <div className="pb-4 border-b-2">
+      {permissions.includes("post:courses") ? 
+          <Link href="/courses/new" className="rounded mr-2 bg-green-800 hover:bg-green-700 text-zinc-200 hover:text-zinc-100 hover:no-underline p-2 float-right">New Course</Link> : <></>
+        }
         <h1 className="text-3xl">Courses</h1>
       </div>
       <div>
