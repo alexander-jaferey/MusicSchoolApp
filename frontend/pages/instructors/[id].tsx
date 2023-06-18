@@ -4,26 +4,16 @@ import {
   withPageAuthRequired,
 } from "@auth0/nextjs-auth0";
 import Layout from "../../components/layout";
-import { DecodedJwt, IndexedStringList, Weekdays } from "../../interfaces";
+import { DecodedJwt, Instructor } from "../../interfaces";
 import React from "react";
 import { InferGetServerSidePropsType, NextApiRequest, NextApiResponse } from "next";
 import jwt_decode from "jwt-decode";
 import Error from "next/error";
 import Link from "next/link";
 import DeleteButton from "../../components/deleteButton";
+import { useRouter } from "next/router";
 
 const dbURL = `${process.env.NEXT_PUBLIC_BACKEND_URL}/instructors/`;
-
-type Data = {
-  success: boolean
-  instructor_id?: string
-  name?: string
-  workdays?: Weekdays[]
-  instruments?: IndexedStringList
-  courses_taught?: IndexedStringList
-  error?: number
-  message?: string
-}
 
 export async function getServerSideProps(context: {
   params: { id: number };
@@ -55,7 +45,7 @@ export async function getServerSideProps(context: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-  const data: Data = await response.json();
+  const data: Instructor = await response.json();
 
   if (data.success == false) {
     const error = data.error;
@@ -86,6 +76,7 @@ function Page({
   errorMessage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { user, isLoading } = useUser();
+  const router = useRouter();
 
   if (error) {
     return (
@@ -140,6 +131,16 @@ function Page({
           </ul>
         </div>
       </div>
+      {permissions.includes("patch:instructors") ? (
+        <button
+          className="rounded mr-2 bg-green-800 hover:bg-green-700 text-zinc-200 p-2"
+          onClick={() => router.push(`/instructors/${id}/edit`)}
+        >
+          Edit
+        </button>
+      ) : (
+        <></>
+      )}
       {permissions.includes("delete:instructors") ?
         <DeleteButton id={id} entity="instructors" /> : <></>
       }
