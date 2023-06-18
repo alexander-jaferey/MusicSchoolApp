@@ -103,6 +103,30 @@ const CourseForm = ({
       {values ? <div>Current: {values.course_title}</div> : <></>}
       <br />
       <input type="text" name="title" id="title" className="mb-3" />
+      <fieldset>
+        <legend className="text-xl">Instrument</legend>
+        {values ? <div>Current: {values.instrument.name}</div> : <></>}
+        <div className="max-h-36 max-w-fit overflow-y-scroll">
+          {Object.entries(instruments).map((entry) => (
+            <>
+              <input
+                type="radio"
+                id="instrument"
+                key={entry[1]}
+                value={entry[1]}
+              />
+              <label
+                key={`instrument-${entry[0]}`}
+                htmlFor={entry[1]}
+                className="px-2"
+              >
+                {entry[1]}
+              </label>
+              <br />
+            </>
+          ))}
+        </div>
+      </fieldset>
       <fieldset className="mb-2">
         <legend className="text-xl">Schedule</legend>
         <div className="max-h-36 max-w-fit overflow-y-scroll">
@@ -122,30 +146,6 @@ const CourseForm = ({
                 className="px-2"
               >
                 {weekday}
-              </label>
-              <br />
-            </>
-          ))}
-        </div>
-      </fieldset>
-      <fieldset>
-        <legend className="text-xl">Instrument</legend>
-        {values ? <div>Current: {values.instrument.name}</div> : <></>}
-        <div className="max-h-36 max-w-fit overflow-y-scroll">
-          {Object.entries(instruments).map((entry) => (
-            <>
-              <input
-                type="radio"
-                id="instrument"
-                key={entry[1]}
-                value={entry[1]}
-              />
-              <label
-                key={`instrument-${entry[0]}`}
-                htmlFor={entry[1]}
-                className="px-2"
-              >
-                {entry[1]}
               </label>
               <br />
             </>
