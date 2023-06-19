@@ -7,12 +7,15 @@
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^1.9.1",
+    "jwt-decode": "^3.1.2",
     "next": "latest",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-paginate": "^8.2.0"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.3",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",

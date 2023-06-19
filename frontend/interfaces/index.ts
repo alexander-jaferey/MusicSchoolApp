@@ -1,46 +1,110 @@
 export type User = {
-  email: string
-  email_verified: boolean
-  name: string
-  nickname: string
-  picture: string
-  sub: string
-  updated_at: string
-}
+  email: string;
+  email_verified: boolean;
+  name: string;
+  nickname: string;
+  picture: string;
+  sub: string;
+  updated_at: string;
+};
 
 export type Instrument = {
-  instrument: string
-  instructors: string[]
-}
+  success: boolean;
+  instrument_id?: string;
+  instrument?: string;
+  instructors?: IndexedStringList;
+  courses?: IndexedStringList;
+  error?: number;
+  message?: string;
+};
 
 export type Instructor = {
-  first_name: string
-  last_name: string
-  workdays: string[]
-  instruments: string[]
-  courses: string[]
-}
+  success: boolean;
+  instructor_id?: string;
+  name?: string;
+  workdays?: Weekdays[];
+  instruments?: IndexedStringList;
+  courses_taught?: IndexedStringList;
+  error?: number;
+  message?: string;
+};
 
 export type Course = {
-  title: string
-  instrument: string
-  schedule: string[]
-  instructors: string[]
-}
+  success: boolean;
+  id?: string;
+  course_title?: string;
+  instrument?: { id: string; name: string };
+  schedule?: Weekdays[];
+  instructors?: IndexedStringList;
+  error?: number;
+  message?: string;
+};
 
 export type InstructorInfo = {
-  instructor: string
-  instruments: string[]
-}
+  instructor: string;
+  instruments: string[];
+};
+
+export type InstrumentsQuery = {
+  instruments: IndexedStringList;
+  success: boolean;
+  total_instruments: number;
+  current_page: number;
+  total_pages: number;
+};
+
+export type InstructorsQuery = {
+  instructors: IndexedInstructorList;
+  success: boolean;
+  total_instructors: number;
+  current_page: number;
+  total_pages: number;
+};
+
+export type CoursesQuery = {
+  courses: IndexedCourseList;
+  success: boolean;
+  total_instruments: number;
+  current_page: number;
+  total_pages: number;
+};
 
 export type IndexedStringList = {
-  [index: string]: string
-}
+  [index: string]: string;
+};
 
 export type IndexedInstructorList = {
-  [index: string]: InstructorInfo
-}
+  [index: string]: InstructorInfo;
+};
 
 export type IndexedCourseList = {
-  [index: string]: IndexedStringList
+  [index: string]: IndexedStringList;
+};
+
+export type DecodedJwt = {
+  iss: string;
+  sub: string;
+  aud: string[];
+  iat: string;
+  exp: string;
+  azp: string;
+  scope: string;
+  permissions: string[];
+};
+
+export type Deleted = {
+  success: boolean;
+  deleted?: number;
+  error?: number;
+  message?: string;
+};
+
+export enum Weekdays {
+  Sun = "Sun",
+  Mon = "Mon",
+  Tue = "Tue",
+  Wed = "Wed",
+  Thu = "Thu",
+  Fri = "Fri",
+  Sat = "Sat",
 }

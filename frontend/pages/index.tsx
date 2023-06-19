@@ -1,14 +1,20 @@
-import { useUser } from '@auth0/nextjs-auth0'
-import Layout from '../components/layout'
+import { useUser } from "@auth0/nextjs-auth0";
+import Layout from "../components/layout";
 
 const Home = () => {
-  const { user, isLoading } = useUser()
+  const { user, isLoading } = useUser();
 
   return (
     <Layout user={user} loading={isLoading}>
-      <h1>Next.js and Auth0 Example</h1>
-
       {isLoading && <p>Loading login info...</p>}
+
+      {!isLoading && (
+        <>
+          <h2 className="text-xl font-bold">Music School App</h2>
+          <p>Application to retrieve and edit information on musical courses for various instruments and their instructors.</p>
+          <br /><br />
+        </>
+      )}
 
       {!isLoading && !user && (
         <>
@@ -32,8 +38,8 @@ const Home = () => {
         </>
       )}
     </Layout>
-  )
-}
+  );
+};
 
 // fast/cached SSR page
-export default Home
+export default Home;
