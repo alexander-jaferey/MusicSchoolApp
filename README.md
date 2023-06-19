@@ -13,7 +13,6 @@ ___
 ### Backend
 
 The `./backend` directory contains all of the files for setting up the database and running the Flask server. See the [backend readme](./backend/README.md) for more information.
-TODO: integrate Auth0, set up testing
 
 <br>
 
