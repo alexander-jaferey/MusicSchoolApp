@@ -45,6 +45,8 @@ For either method below, you can log in with the following credentials:
 
 All accounts use the password `BLANK`
 
+Additionally, the client JWT signing secret is `BLANK`
+
 #### **Obtaining a JWT**
 
 A JWT for API requests can be obtained at the URL https://xskj.us.auth0.com/authorize?udience=musicschool&response_type=token&client_id=IYFMmmLin1gwhdIihoAxY04da5kHqx8Z&redirect_uri=https://musicschoolapp.onrender.com. The URL of the callback page after login will have the JWT embedded in it.
