@@ -24,7 +24,12 @@ ___
 
 ## Testing
 
-**TODO**
+`tests.py` contains a full Python Unittest suite of tests for all available API functions. To run tests, update the `TEST_DB_URL` and JWT variables in `.env` and execute the following:
+```
+$ ./db-init.sh
+$ python3 tests.py
+```
+`db-init.sh` is a shell script that will create a database with the name `musicschool-test` and populate it with data using `db-test.sql`. Note that `db-test.sql` will prep the database for the user `postgres`, but the database user can be changed by editing the file.
 
 <br>
 
