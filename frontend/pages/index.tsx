@@ -6,9 +6,15 @@ const Home = () => {
 
   return (
     <Layout user={user} loading={isLoading}>
-      <h1>Next.js and Auth0 Example</h1>
-
       {isLoading && <p>Loading login info...</p>}
+
+      {!isLoading && (
+        <>
+          <h2 className="text-xl font-bold">Music School App</h2>
+          <p>Application to retrieve and edit information on musical courses for various instruments and their instructors.</p>
+          <br /><br />
+        </>
+      )}
 
       {!isLoading && !user && (
         <>
