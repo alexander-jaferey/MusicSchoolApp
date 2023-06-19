@@ -359,7 +359,7 @@ COPY public.instructors (id, first_name, last_name, schedule) FROM stdin;
 5	Jack	White	{Sun,Wed,Fri,Sat}
 6	Jaco	Pastorius	{Sun,Tue,Wed,Thu}
 7	Tina	Weymouth	{Sun,Wed,Fri,Sat}
-8	Paul	McCartney	{Mon,Tue,Fri}
+8	Paul	Mccartney	{Mon,Tue,Fri}
 9	John Paul	Jones	{Mon,Thu,Fri,Sat}
 10	Ringo	Starr	{Mon,Wed,Fri,Sat}
 11	Danny	Carey	{Sun,Tue,Thu,Sat}
